@@ -227,108 +227,108 @@
 	</div>
 </div>
 
-<div class="drawer drawer-end z-[100]">
-	<input bind:this={userMenu} id="user-menu" type="checkbox" class="drawer-toggle" />
-	<div class="drawer-content"></div>
-	<div class="drawer-side">
-		<label for="user-menu" aria-label="close sidebar" class="drawer-overlay"></label>
-		<div class="p-4 w-80 min-h-full bg-base-200 text-base-content">
-			<div role="tablist" class="tabs tabs-bordered">
-				<button
-					role="tab"
-					on:click={() => (activeUserTab = 'stats')}
-					class={`tab ${activeUserTab === 'stats' ? 'tab-active' : ''}`}>Stats</button
-				>
-				<button
-					role="tab"
-					on:click={() => (activeUserTab = 'quests')}
-					class={`tab ${activeUserTab === 'quests' ? 'tab-active' : ''}`}>Quests</button
-				>
-				<button
-					role="tab"
-					on:click={() => (activeUserTab = 'settings')}
-					class={`tab ${activeUserTab === 'settings' ? 'tab-active' : ''}`}>Settings</button
-				>
-			</div>
-			<div class="mt-4">
-				{#if activeUserTab === 'settings'}
-					<button on:click={signOut} disabled={isSigningOut} class="btn btn-active btn-block"
-						>Sign out</button
+{#if $toastStore !== null}
+	<div class="drawer drawer-end z-[100]">
+		<input bind:this={userMenu} id="user-menu" type="checkbox" class="drawer-toggle" />
+		<div class="drawer-content"></div>
+		<div class="drawer-side">
+			<label for="user-menu" aria-label="close sidebar" class="drawer-overlay"></label>
+			<div class="p-4 w-80 min-h-full bg-base-200 text-base-content">
+				<div role="tablist" class="tabs tabs-bordered">
+					<button
+						role="tab"
+						on:click={() => (activeUserTab = 'stats')}
+						class={`tab ${activeUserTab === 'stats' ? 'tab-active' : ''}`}>Stats</button
 					>
-				{:else if activeUserTab === 'stats'}
-					<div class="stat">
-						<div class="stat-figure text-neutral-content">
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								viewBox="0 0 24 24"
-								fill="currentColor"
-								class="w-8 h-8"
-							>
-								<path
-									fill-rule="evenodd"
-									d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
-									clip-rule="evenodd"
-								/>
-							</svg>
+					<button
+						role="tab"
+						on:click={() => (activeUserTab = 'quests')}
+						class={`tab ${activeUserTab === 'quests' ? 'tab-active' : ''}`}>Quests</button
+					>
+					<button
+						role="tab"
+						on:click={() => (activeUserTab = 'settings')}
+						class={`tab ${activeUserTab === 'settings' ? 'tab-active' : ''}`}>Settings</button
+					>
+				</div>
+				<div class="mt-4">
+					{#if activeUserTab === 'settings'}
+						<button on:click={signOut} disabled={isSigningOut} class="btn btn-active btn-block"
+							>Sign out</button
+						>
+					{:else if activeUserTab === 'stats'}
+						<div class="stat">
+							<div class="stat-figure text-neutral-content">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									viewBox="0 0 24 24"
+									fill="currentColor"
+									class="w-8 h-8"
+								>
+									<path
+										fill-rule="evenodd"
+										d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
+										clip-rule="evenodd"
+									/>
+								</svg>
+							</div>
+							<div class="stat-value">{data.profile.booksFinished}</div>
+							<div class="text-active">Books rewritten</div>
 						</div>
-						<div class="stat-value">{data.profile.booksFinished}</div>
-						<div class="text-active">Books rewritten</div>
-					</div>
 
-					<div class="stat">
-						<div class="stat-figure text-neutral-content">
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke-width="1.5"
-								stroke="currentColor"
-								class="w-8 h-8"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									d="M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a.64.64 0 0 1-.657.643 48.39 48.39 0 0 1-4.163-.3c.186 1.613.293 3.25.315 4.907a.656.656 0 0 1-.658.663v0c-.355 0-.676-.186-.959-.401a1.647 1.647 0 0 0-1.003-.349c-1.036 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401v0c.31 0 .555.26.532.57a48.039 48.039 0 0 1-.642 5.056c1.518.19 3.058.309 4.616.354a.64.64 0 0 0 .657-.643v0c0-.355-.186-.676-.401-.959a1.647 1.647 0 0 1-.349-1.003c0-1.035 1.008-1.875 2.25-1.875 1.243 0 2.25.84 2.25 1.875 0 .369-.128.713-.349 1.003-.215.283-.4.604-.4.959v0c0 .333.277.599.61.58a48.1 48.1 0 0 0 5.427-.63 48.05 48.05 0 0 0 .582-4.717.532.532 0 0 0-.533-.57v0c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.035 0-1.875-1.007-1.875-2.25s.84-2.25 1.875-2.25c.37 0 .713.128 1.003.349.283.215.604.401.96.401v0a.656.656 0 0 0 .658-.663 48.422 48.422 0 0 0-.37-5.36c-1.886.342-3.81.574-5.766.689a.578.578 0 0 1-.61-.58v0Z"
-								/>
-							</svg>
+						<div class="stat">
+							<div class="stat-figure text-neutral-content">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke-width="1.5"
+									stroke="currentColor"
+									class="w-8 h-8"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										d="M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a.64.64 0 0 1-.657.643 48.39 48.39 0 0 1-4.163-.3c.186 1.613.293 3.25.315 4.907a.656.656 0 0 1-.658.663v0c-.355 0-.676-.186-.959-.401a1.647 1.647 0 0 0-1.003-.349c-1.036 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401v0c.31 0 .555.26.532.57a48.039 48.039 0 0 1-.642 5.056c1.518.19 3.058.309 4.616.354a.64.64 0 0 0 .657-.643v0c0-.355-.186-.676-.401-.959a1.647 1.647 0 0 1-.349-1.003c0-1.035 1.008-1.875 2.25-1.875 1.243 0 2.25.84 2.25 1.875 0 .369-.128.713-.349 1.003-.215.283-.4.604-.4.959v0c0 .333.277.599.61.58a48.1 48.1 0 0 0 5.427-.63 48.05 48.05 0 0 0 .582-4.717.532.532 0 0 0-.533-.57v0c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.035 0-1.875-1.007-1.875-2.25s.84-2.25 1.875-2.25c.37 0 .713.128 1.003.349.283.215.604.401.96.401v0a.656.656 0 0 0 .658-.663 48.422 48.422 0 0 0-.37-5.36c-1.886.342-3.81.574-5.766.689a.578.578 0 0 1-.61-.58v0Z"
+									/>
+								</svg>
+							</div>
+							<div class="stat-title text-primary">Rewritten words</div>
+							<div class="stat-value text-active">{data.profile.wordsFinished}</div>
 						</div>
-						<div class="stat-title text-primary">Rewritten words</div>
-						<div class="stat-value text-active">{data.profile.wordsFinished}</div>
-					</div>
 
-					<div class="stat">
-						<div class="stat-figure text-neutral-content">
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke-width="1.5"
-								stroke="currentColor"
-								class="w-8 h-8"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-								/>
-							</svg>
+						<div class="stat">
+							<div class="stat-figure text-neutral-content">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke-width="1.5"
+									stroke="currentColor"
+									class="w-8 h-8"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+									/>
+								</svg>
+							</div>
+							<div class="stat-title text-primary">Rewritten pages</div>
+							<div class="stat-value text-active">{data.profile.pagesFinished}</div>
 						</div>
-						<div class="stat-title text-primary">Rewritten pages</div>
-						<div class="stat-value text-active">{data.profile.pagesFinished}</div>
-					</div>
 
-					<div class="divider">Badges</div>
+						<div class="divider">Badges</div>
 
-					<p class="text-center opacity-50">Coming soon...</p>
-				{:else if activeUserTab === 'quests'}
-					<p class="text-center opacity-50">Coming soon...</p>
-				{/if}
+						<p class="text-center opacity-50">Coming soon...</p>
+					{:else if activeUserTab === 'quests'}
+						<p class="text-center opacity-50">Coming soon...</p>
+					{/if}
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
 
-{#if $toastStore !== null}
 	<div class="toast z-[150] toast-end">
 		<div
 			class={`alert rounded-md ${typeof $toastStore === 'string' ? 'alert-error bg-error-content border-error-content text-error' : getToastClasses($toastStore.type)}`}
