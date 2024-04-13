@@ -228,6 +228,29 @@
 </div>
 
 {#if $toastStore !== null}
+	<div class="toast z-[150] toast-end">
+		<div
+			class={`alert rounded-md ${typeof $toastStore === 'string' ? 'alert-error bg-error-content border-error-content text-error' : getToastClasses($toastStore.type)}`}
+		>
+			<span>{typeof $toastStore === 'string' ? $toastStore : $toastStore.text}</span>
+
+			<button on:click={() => toastStore.set(null)} class="btn btn-rounded btn-sm btn-ghost p-1">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke-width="1.5"
+					stroke="currentColor"
+					class="w-6 h-6"
+				>
+					<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+				</svg>
+			</button>
+		</div>
+	</div>
+{/if}
+
+{#if data.profile && data.user}
 	<div class="drawer drawer-end z-[100]">
 		<input bind:this={userMenu} id="user-menu" type="checkbox" class="drawer-toggle" />
 		<div class="drawer-content"></div>
@@ -329,29 +352,6 @@
 		</div>
 	</div>
 
-	<div class="toast z-[150] toast-end">
-		<div
-			class={`alert rounded-md ${typeof $toastStore === 'string' ? 'alert-error bg-error-content border-error-content text-error' : getToastClasses($toastStore.type)}`}
-		>
-			<span>{typeof $toastStore === 'string' ? $toastStore : $toastStore.text}</span>
-
-			<button on:click={() => toastStore.set(null)} class="btn btn-rounded btn-sm btn-ghost p-1">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke-width="1.5"
-					stroke="currentColor"
-					class="w-6 h-6"
-				>
-					<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-				</svg>
-			</button>
-		</div>
-	</div>
-{/if}
-
-{#if data.profile}
 	<dialog
 		bind:this={streakModal}
 		id="streak-modal"
