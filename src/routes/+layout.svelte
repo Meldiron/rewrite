@@ -351,98 +351,104 @@
 	</div>
 {/if}
 
-<dialog
-	bind:this={streakModal}
-	id="streak-modal"
-	class="z-[200] modal modal-bottom sm:modal-middle"
->
-	<div class="modal-box">
-		<h3 class="font-bold text-lg">Streaks</h3>
-		<p class="py-4 text-primary">
-			Rewrite at least one page every day, and increase your streak by one point each time. High
-			streaks show dedication and give profile badges.
-		</p>
-		<p>
-			Your current streak is: <span class="text-xl font-bold">{data.profile.streak}</span>
-		</p>
+{#if data.profile}
+	<dialog
+		bind:this={streakModal}
+		id="streak-modal"
+		class="z-[200] modal modal-bottom sm:modal-middle"
+	>
+		<div class="modal-box">
+			<h3 class="font-bold text-lg">Streaks</h3>
+			<p class="py-4 text-primary">
+				Rewrite at least one page every day, and increase your streak by one point each time. High
+				streaks show dedication and give profile badges.
+			</p>
+			<p>
+				Your current streak is: <span class="text-xl font-bold">{data.profile.streak}</span>
+			</p>
 
-		{#if !hasStreak(data.profile.lastStreakDate)}
-			<div role="alert" class="alert alert-error mt-4">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="stroke-current shrink-0 h-6 w-6"
-					fill="none"
-					viewBox="0 0 24 24"
-					><path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-					/></svg
-				>
-				<span
-					>You haven't completed streak today Rewrite a page to increase your streak by 1 point.</span
-				>
-			</div>
-		{:else}
-			<div role="alert" class="alert mt-4">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-					class="stroke-info shrink-0 w-6 h-6"
-					><path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-					></path></svg
-				>
-				<span class="text-primary">You have completed streak today. Come back tomorrow.</span>
-			</div>
-		{/if}
+			{#if !hasStreak(data.profile.lastStreakDate)}
+				<div role="alert" class="alert alert-error mt-4">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="stroke-current shrink-0 h-6 w-6"
+						fill="none"
+						viewBox="0 0 24 24"
+						><path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+						/></svg
+					>
+					<span
+						>You haven't completed streak today Rewrite a page to increase your streak by 1 point.</span
+					>
+				</div>
+			{:else}
+				<div role="alert" class="alert mt-4">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+						class="stroke-info shrink-0 w-6 h-6"
+						><path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+						></path></svg
+					>
+					<span class="text-primary">You have completed streak today. Come back tomorrow.</span>
+				</div>
+			{/if}
 
-		<div class="modal-action">
-			<form method="dialog">
-				<button class="btn">Close</button>
-			</form>
-		</div>
-	</div>
-</dialog>
-
-<dialog bind:this={levelModal} id="level-modal" class="z-[200] modal modal-bottom sm:modal-middle">
-	<div class="modal-box">
-		<h3 class="font-bold text-lg">Level</h3>
-		<p class="py-4 text-primary">
-			Earn points for each rewritten letter and level up. There are rewards at specific level
-			minestones.
-		</p>
-
-		<div class="stats shadow w-full">
-			<div class="stat pl-0">
-				<div class="stat-title">Current level</div>
-				<div class="stat-value">{getLevel(data.profile.xp)}</div>
-				<div class="stat-desc">and {getExtraXp(data.profile.xp)} points</div>
-			</div>
-
-			<div class="stat float-right text-right pr-0">
-				<div class="stat-title">Remaining points</div>
-				<div class="stat-value">{getXpRemaining(data.profile.xp)}</div>
-				<div class="stat-desc">to reach level {getLevel(data.profile.xp) + 1}</div>
+			<div class="modal-action">
+				<form method="dialog">
+					<button class="btn">Close</button>
+				</form>
 			</div>
 		</div>
+	</dialog>
 
-		<progress class="progress w-full" value={getLevelProgress(data.profile.xp)} max={100}
-		></progress>
+	<dialog
+		bind:this={levelModal}
+		id="level-modal"
+		class="z-[200] modal modal-bottom sm:modal-middle"
+	>
+		<div class="modal-box">
+			<h3 class="font-bold text-lg">Level</h3>
+			<p class="py-4 text-primary">
+				Earn points for each rewritten letter and level up. There are rewards at specific level
+				minestones.
+			</p>
 
-		<div class="modal-action">
-			<a on:click={() => levelModal.close()} href="/app/unlocks" class="btn btn-primary"
-				>Show unlocks</a
-			>
+			<div class="stats shadow w-full">
+				<div class="stat pl-0">
+					<div class="stat-title">Current level</div>
+					<div class="stat-value">{getLevel(data.profile.xp)}</div>
+					<div class="stat-desc">and {getExtraXp(data.profile.xp)} points</div>
+				</div>
 
-			<form method="dialog">
-				<button class="btn">Close</button>
-			</form>
+				<div class="stat float-right text-right pr-0">
+					<div class="stat-title">Remaining points</div>
+					<div class="stat-value">{getXpRemaining(data.profile.xp)}</div>
+					<div class="stat-desc">to reach level {getLevel(data.profile.xp) + 1}</div>
+				</div>
+			</div>
+
+			<progress class="progress w-full" value={getLevelProgress(data.profile.xp)} max={100}
+			></progress>
+
+			<div class="modal-action">
+				<a on:click={() => levelModal.close()} href="/app/unlocks" class="btn btn-primary"
+					>Show unlocks</a
+				>
+
+				<form method="dialog">
+					<button class="btn">Close</button>
+				</form>
+			</div>
 		</div>
-	</div>
-</dialog>
+	</dialog>
+{/if}
