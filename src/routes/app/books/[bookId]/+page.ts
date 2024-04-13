@@ -11,7 +11,10 @@ export const load: PageLoad = async ({ params }) => {
 		Query.equal('bookId', params.bookId)
 	]);
 
-	const finishes = await databases.listDocuments('main', 'finishes', [Query.limit(1), Query.equal('bookId', params.bookId)]);
+	const finishes = await databases.listDocuments('main', 'finishes', [
+		Query.limit(1),
+		Query.equal('bookId', params.bookId)
+	]);
 
-	return { book, pages, finishedPageNumbers: ((finishes.documents[0] ?? {}).pageNumbers ?? []) };
+	return { book, pages, finishedPageNumbers: (finishes.documents[0] ?? {}).pageNumbers ?? [] };
 };

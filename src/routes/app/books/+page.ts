@@ -4,9 +4,7 @@ import type { PageLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
 
 export const load: PageLoad = async () => {
-	const books = await databases.listDocuments('main', 'books', [
-		Query.limit(100)
-	]);
+	const books = await databases.listDocuments('main', 'books', [Query.limit(100)]);
 
-	return {books};
+	return { books };
 };

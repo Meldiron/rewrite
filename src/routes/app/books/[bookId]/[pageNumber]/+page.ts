@@ -8,12 +8,20 @@ export const load: PageLoad = async ({ params }) => {
 	const book = await databases.getDocument('main', 'books', params.bookId);
 	const page = await databases.getDocument('main', 'pages', pageId);
 
-	const pages = await databases.listDocuments('main', 'pages', [Query.limit(1), Query.equal('bookId', params.bookId)]);
-	const finishes = await databases.listDocuments('main', 'finishes', [Query.limit(1), Query.equal('bookId', params.bookId)]);
-	
-	const isCompleted = finishes.documents.length <= 0 ? false : (finishes.documents[0].pageNumbers.includes(page.page));
+	const pages = await databases.listDocuments('main', 'pages', [
+		Query.limit(1),
+		Query.equal('bookId', params.bookId)
+	]);
+	const finishes = await databases.listDocuments('main', 'finishes', [
+		Query.limit(1),
+		Query.equal('bookId', params.bookId)
+	]);
+
+	const isCompleted =
+		finishes.documents.length <= 0 ? false : finishes.documents[0].pageNumbers.includes(page.page);
 
 	const totalPages = pages.total;
+	const totalFinishes = finishes.total;
 
-	return { book, page, totalPages, isCompleted };
+	return { book, page, totalPages, isCompleted, totalFinishes };
 };

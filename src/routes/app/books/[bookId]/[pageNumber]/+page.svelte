@@ -49,7 +49,7 @@
 	async function finishPage() {
 		data.isCompleted = true;
 
-		$toastStore = { type: 'debug', text: 'Saving...' };
+		$toastStore = { type: 'info', text: 'Saving...' };
 
 		const finishes = await databases.listDocuments('main', 'finishes', [
 			Query.equal('bookId', data.book.$id),
@@ -78,9 +78,27 @@
 			streak++;
 		}
 
+		let xp = data.profile.xp ?? 0;
+		xp += data.page.text.split(' ').join('').split('\n').join('').length;
+
+		let wordsFinished = data.profile.wordsFinished ?? 0;
+		wordsFinished += data.page.text.split('\n').join(' ').split(' ').length;
+
+		let pagesFinished = data.profile.pagesFinished ?? 0;
+		pagesFinished += 1;
+
+		let booksFinished = data.profile.booksFinished ?? 0;
+		if (data.totalFinishes + 1 >= data.totalPages) {
+			booksFinished += 1;
+		}
+
 		await databases.updateDocument('main', 'profiles', data.profile.$id, {
 			lastStreakDate: new Date().toISOString(),
-			streak
+			streak,
+			xp,
+			wordsFinished,
+			pagesFinished,
+			booksFinished
 		});
 
 		await invalidateAll();
@@ -262,10 +280,10 @@
 
 <div class="fixed right-0 top-0 h-full flex items-center pointer-events-none">
 	<div
-		class="indicator max-h-[75vh] rounded-xl rounded-r-none transform translate-x-[80%] transition duration-500 hover:translate-x-[0%] h-full pointer-events-auto"
+		class="indicator max-h-[75vh] rounded-xl rounded-r-none transform translate-x-[70%] transition duration-500 hover:translate-x-[0%] h-full pointer-events-auto"
 	>
 		<span
-			class="pointer-events-none indicator-item indicator-start btn btn-circle btn-active btn-primary"
+			class="pointer indicator-item indicator-middle indicator-start btn btn-circle btn-active btn-primary"
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -275,16 +293,7 @@
 				stroke="currentColor"
 				class="w-5 h-5"
 			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-				/>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-				/>
+				<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
 			</svg>
 		</span>
 

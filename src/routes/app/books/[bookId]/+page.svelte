@@ -48,6 +48,10 @@
 										href={`/app/books/${data.book.$id}/${page.page}`}
 										class="btn btn-sm btn-active btn-ghost">Rewrite page</a
 									>
+								{:else}
+									<a href={`/app/books/${data.book.$id}/${page.page}`} class="btn btn-sm btn-ghost"
+										>View page</a
+									>
 								{/if}</td
 							>
 						</tr>
