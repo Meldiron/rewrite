@@ -6,8 +6,6 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import { toastStore } from '$lib/stores';
 
-	export let data: PageData;
-
 	let submitting = false;
 	let files: any = null;
 
