@@ -102,7 +102,7 @@ export default async ({ req, res, log, error }) => {
       bookId: fileId,
       page: page,
       text: pageText,
-      words: pageText.split(" ").length,
+      words: pageText.split("\n").join(" ").split(" ").length,
     }, [
       Permission.read(Role.user(userId)),
     ]);

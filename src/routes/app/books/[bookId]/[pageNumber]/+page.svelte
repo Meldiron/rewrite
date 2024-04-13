@@ -5,11 +5,12 @@
 	import type { PageData } from './$types';
 	import { invalidateAll } from '$app/navigation';
 	import { latinize } from '$lib/latinize';
+	import { hasStreak } from '$lib/utils';
 
 	export let data: PageData;
 
-	const fileId = `${data.book.$id}-${data.page.page}`;
-	const fileUrl = storage
+	$: fileId = `${data.book.$id}-${data.page.page}`;
+	$: fileUrl = storage
 		.getFilePreview(
 			'pages',
 			fileId,
@@ -27,14 +28,84 @@
 		)
 		.toString();
 
-	const linesOfWords = data.page.text.split('\n').map((line: string) => line.split(' '));
+	$: linesOfWords = data.page.text.split('\n').map((line: string) => line.split(' '));
 
 	let activeLine = 0;
 	let activeWord = 0;
 	let correctLetters = 0;
 	let wrongLetters = 0;
 
+	$: {
+		if (data) {
+			activeLine = 0;
+			activeWord = 0;
+			correctLetters = 0;
+			wrongLetters = 0;
+		}
+	}
+
 	$: currentWord = linesOfWords[activeLine][activeWord];
+
+	async function finishPage() {
+		data.isCompleted = true;
+
+		$toastStore = { type: 'debug', text: 'Saving...' };
+
+		const finishes = await databases.listDocuments('main', 'finishes', [
+			Query.equal('bookId', data.book.$id),
+			Query.limit(1)
+		]);
+		if (finishes.documents.length <= 0) {
+			await databases.createDocument('main', 'finishes', ID.unique(), {
+				userId: data.user?.$id ?? 'UNKNOWN',
+				bookId: data.book.$id,
+				pageNumbers: [data.page.page]
+			});
+		} else {
+			const pageNumbers = [...finishes.documents[0].pageNumbers];
+
+			if (!pageNumbers.includes(data.page.page)) {
+				pageNumbers.push(data.page.page);
+			}
+
+			await databases.updateDocument('main', 'finishes', finishes.documents[0].$id, {
+				pageNumbers
+			});
+		}
+
+		let streak = data.profile.streak ?? 0;
+		if (!hasStreak(data.profile.lastStreakDate)) {
+			streak++;
+		}
+
+		await databases.updateDocument('main', 'profiles', data.profile.$id, {
+			lastStreakDate: new Date().toISOString(),
+			streak
+		});
+
+		await invalidateAll();
+
+		$toastStore = { type: 'success', text: 'Page marked as completed.' };
+	}
+
+	async function previousWord(target: any) {
+		correctLetters = 0;
+		wrongLetters = 0;
+
+		activeWord--;
+
+		if (activeWord <= 0) {
+			activeWord = 0;
+			activeLine--;
+		}
+
+		if (activeLine <= 0) {
+			activeLine = 0;
+			activeWord = 0;
+			correctLetters = 0;
+			wrongLetters = 0;
+		}
+	}
 
 	async function nextWord(target: any) {
 		target.value = '';
@@ -54,34 +125,7 @@
 			correctLetters = 0;
 			wrongLetters = 0;
 
-			data.isCompleted = true;
-
-			$toastStore = { type: 'debug', text: 'Saving...' };
-
-			const finishes = await databases.listDocuments('main', 'finishes', [
-				Query.equal('bookId', data.book.$id),
-				Query.limit(1)
-			]);
-			if (finishes.documents.length <= 0) {
-				await databases.createDocument('main', 'finishes', ID.unique(), {
-					userId: data.user?.$id ?? 'UNKNOWN',
-					bookId: data.book.$id,
-					pageNumbers: [data.page.page]
-				});
-			} else {
-				const pageNumbers = [...finishes.documents[0].pageNumbers];
-
-				if (!pageNumbers.includes(data.page.page)) {
-					pageNumbers.push(data.page.page);
-				}
-
-				await databases.updateDocument('main', 'finishes', finishes.documents[0].$id, {
-					pageNumbers
-				});
-			}
-
-			$toastStore = { type: 'success', text: 'Page marked as completed.' };
-			await invalidateAll();
+			finishPage();
 		}
 	}
 
@@ -118,6 +162,11 @@
 	}
 
 	function onKeyDown(e: any) {
+		if (e.target.value === '' && e.key.toLowerCase() === 'backspace') {
+			previousWord(e.target);
+			return;
+		}
+
 		if (e.key.toLowerCase() === 'enter') {
 			nextWord(e.target);
 		}
@@ -133,18 +182,48 @@
 	<h1 class="text-4xl font-semibold text-primary text-center my-8">
 		<a href={`/app/books/${data.book.$id}`} class="hover:underline">{data.book.title}</a>
 	</h1>
-	<div class="divider">Page {data.page.page} / {data.totalPages}</div>
+	<div class="divider">
+		<a
+			href={`/app/books/${data.book.$id}/${data.page.page - 1}`}
+			class="btn btn-xs btn-active btn-ghost">Back</a
+		>
+		Page {data.page.page} / {data.totalPages}
+
+		<a
+			href={`/app/books/${data.book.$id}/${data.page.page + 1}`}
+			class="btn btn-xs btn-active btn-ghost">Next</a
+		>
+	</div>
+
+	{#if data.isCompleted}
+		<div role="alert" class="alert alert-success mb-4">
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="stroke-current shrink-0 h-6 w-6"
+				fill="none"
+				viewBox="0 0 24 24"
+				><path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+				/></svg
+			>
+			<span>You have already rewritten this page.</span>
+			<a href={`/app/books/${data.book.$id}/${data.page.page + 1}`} class="btn btn-primary"
+				>Next page</a
+			>
+		</div>
+	{/if}
 
 	<div class="card relative p-10 rounded-md bg-base-100 shadow-xl p-3 text-xl">
 		{#if data.isCompleted}
 			<div
-				class="absolute rounded-xl inset-0 bg-gradient-to-b from-transparent via-[rgba(0,0,0,0.8)] to-black flex items-start pt-8 justify-center backdrop-blur-md"
-			>
-				Already rewritten.
-			</div>
+				class="absolute rounded-xl inset-0 bg-gradient-to-b from-[rgba(0,0,0,0.5)] via-[rgba(0,0,0,0.8)] to-[rgba(0,0,0,0.5)] flex items-start pt-4 justify-center pointer-events-none"
+			></div>
 		{/if}
 		{#each linesOfWords as words, lineIndex}
-			<p class="my-1 inline-flex gap-1 text-primary text-opacity-60">
+			<p class="my-1 flex flex-wrap gap-1 text-primary text-opacity-60">
 				{#each words as word, wordIndex}
 					{@const isActiveLine = activeLine === lineIndex}
 					{@const isActiveWord = isActiveLine && activeWord === wordIndex}
@@ -175,16 +254,19 @@
 		on:keydown={onKeyDown}
 		on:input={onChange}
 		type="text"
+		autofocus={true}
 		placeholder="Type here"
 		class="input input-lg border-3 input-bordered w-full"
 	/>
 </div>
 
-<div class="fixed right-6 top-0 h-full flex items-center">
+<div class="fixed right-0 top-0 h-full flex items-center pointer-events-none">
 	<div
-		class="indicator max-h-[75vh] rounded-xl transform translate-x-[90%] transition duration-1000 hover:translate-x-[0%] h-full"
+		class="indicator max-h-[75vh] rounded-xl rounded-r-none transform translate-x-[80%] transition duration-500 hover:translate-x-[0%] h-full pointer-events-auto"
 	>
-		<span class="indicator-item indicator-start btn btn-circle btn-active btn-primary">
+		<span
+			class="pointer-events-none indicator-item indicator-start btn btn-circle btn-active btn-primary"
+		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				fill="none"
@@ -206,6 +288,6 @@
 			</svg>
 		</span>
 
-		<img src={fileUrl} alt="Screenshot" class="rounded-xl" />
+		<img src={fileUrl} alt="Screenshot" class="rounded-xl rounded-r-none" />
 	</div>
 </div>

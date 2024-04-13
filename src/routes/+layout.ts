@@ -1,17 +1,43 @@
-import type { Models } from 'appwrite';
+import { ID, type Models } from 'appwrite';
 import type { LayoutLoad } from './$types';
-import { account } from '$lib/appwrite';
+import { account, databases } from '$lib/appwrite';
 
 export let ssr = false;
 
 export const load: LayoutLoad = async () => {
-    let user: null | Models.User<any> = null;
+	let user: null | Models.User<any> = null;
 
-    try {
-        user = await account.get();
-    } catch(err) {
-        console.warn(err);
-    }
+	try {
+		user = await account.get();
+	} catch (err) {
+		console.warn(err);
+	}
 
-	return { user };
+	let profile: null | any = null;
+
+	if (user) {
+		if (user.prefs.profileId) {
+			profile = await databases.getDocument('main', 'profiles', user.prefs.profileId);
+		} else {
+			profile = await databases.createDocument('main', 'profiles', ID.unique(), {
+				streak: 0,
+				lastStreakDate: null,
+				xp: 0,
+				wordsFinished: 0,
+				pagesFinished: 0,
+				booksFinished: 0,
+				coins: 0,
+				currentQuest: null,
+				badges: []
+			});
+			const newPrefs = {
+				...user.prefs,
+				profileId: profile.$id
+			};
+			await account.updatePrefs(newPrefs);
+			user.prefs = newPrefs;
+		}
+	}
+
+	return { user, profile };
 };
