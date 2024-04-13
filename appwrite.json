@@ -1,314 +1,329 @@
 {
-	"projectId": "rewrite",
-	"projectName": "rewrite",
-	"functions": [
-		{
-			"$id": "addBook",
-			"name": "addBook",
-			"runtime": "node-18.0",
-			"execute": ["users"],
-			"events": [],
-			"schedule": "",
-			"timeout": 900,
-			"enabled": true,
-			"logging": true,
-			"entrypoint": "src/main.js",
-			"commands": "npm install",
-			"ignore": ["node_modules", ".npm"],
-			"path": "functions/addBook"
-		}
-	],
-	"buckets": [
-		{
-			"$id": "books",
-			"$createdAt": "2024-04-12T15:32:20.035+00:00",
-			"$updatedAt": "2024-04-12T15:32:55.126+00:00",
-			"$permissions": ["create(\"any\")"],
-			"fileSecurity": false,
-			"name": "books",
-			"enabled": true,
-			"maximumFileSize": 150000000,
-			"allowedFileExtensions": ["epub"],
-			"compression": "none",
-			"encryption": true,
-			"antivirus": true
-		},
-		{
-			"$id": "pages",
-			"$createdAt": "2024-04-13T01:27:09.046+00:00",
-			"$updatedAt": "2024-04-13T01:27:09.046+00:00",
-			"$permissions": [],
-			"fileSecurity": true,
-			"name": "pages",
-			"enabled": true,
-			"maximumFileSize": 50000000,
-			"allowedFileExtensions": ["png"],
-			"compression": "none",
-			"encryption": true,
-			"antivirus": true
-		}
-	],
-	"databases": [
-		{
-			"$id": "main",
-			"name": "main",
-			"$createdAt": "2024-04-12T19:26:39.575+00:00",
-			"$updatedAt": "2024-04-12T19:26:39.575+00:00",
-			"enabled": true
-		}
-	],
-	"collections": [
-		{
-			"$id": "books",
-			"$permissions": [],
-			"databaseId": "main",
-			"name": "books",
-			"enabled": true,
-			"documentSecurity": true,
-			"attributes": [
-				{
-					"key": "title",
-					"type": "string",
-					"status": "available",
-					"error": "",
-					"required": true,
-					"array": false,
-					"size": 2048,
-					"default": null
-				},
-				{
-					"key": "author",
-					"type": "string",
-					"status": "available",
-					"error": "",
-					"required": true,
-					"array": false,
-					"size": 2048,
-					"default": null
-				},
-				{
-					"key": "publisher",
-					"type": "string",
-					"status": "available",
-					"error": "",
-					"required": true,
-					"array": false,
-					"size": 2048,
-					"default": null
-				},
-				{
-					"key": "ready",
-					"type": "boolean",
-					"status": "available",
-					"error": "",
-					"required": true,
-					"array": false,
-					"default": null
-				}
-			],
-			"indexes": []
-		},
-		{
-			"$id": "pages",
-			"$permissions": [],
-			"databaseId": "main",
-			"name": "pages",
-			"enabled": true,
-			"documentSecurity": true,
-			"attributes": [
-				{
-					"key": "bookId",
-					"type": "string",
-					"status": "available",
-					"error": "",
-					"required": true,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "page",
-					"type": "integer",
-					"status": "available",
-					"error": "",
-					"required": true,
-					"array": false,
-					"min": -9223372036854775808,
-					"max": 9223372036854775807,
-					"default": null
-				},
-				{
-					"key": "text",
-					"type": "string",
-					"status": "available",
-					"error": "",
-					"required": true,
-					"array": false,
-					"size": 1000000,
-					"default": null
-				},
-				{
-					"key": "words",
-					"type": "integer",
-					"status": "available",
-					"error": "",
-					"required": true,
-					"array": false,
-					"min": -9223372036854775808,
-					"max": 9223372036854775807,
-					"default": null
-				}
-			],
-			"indexes": []
-		},
-		{
-			"$id": "finishes",
-			"$permissions": ["create(\"users\")"],
-			"databaseId": "main",
-			"name": "finishes",
-			"enabled": true,
-			"documentSecurity": true,
-			"attributes": [
-				{
-					"key": "bookId",
-					"type": "string",
-					"status": "available",
-					"error": "",
-					"required": true,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "userId",
-					"type": "string",
-					"status": "available",
-					"error": "",
-					"required": true,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "pageNumbers",
-					"type": "integer",
-					"status": "available",
-					"error": "",
-					"required": false,
-					"array": true,
-					"min": -9223372036854775808,
-					"max": 9223372036854775807,
-					"default": null
-				}
-			],
-			"indexes": []
-		},
-		{
-			"$id": "profiles",
-			"$permissions": ["create(\"users\")"],
-			"databaseId": "main",
-			"name": "profiles",
-			"enabled": true,
-			"documentSecurity": true,
-			"attributes": [
-				{
-					"key": "lastStreakDate",
-					"type": "datetime",
-					"status": "available",
-					"error": "",
-					"required": false,
-					"array": false,
-					"format": "",
-					"default": null
-				},
-				{
-					"key": "streak",
-					"type": "integer",
-					"status": "available",
-					"error": "",
-					"required": true,
-					"array": false,
-					"min": -9223372036854775808,
-					"max": 9223372036854775807,
-					"default": null
-				},
-				{
-					"key": "xp",
-					"type": "integer",
-					"status": "available",
-					"error": "",
-					"required": true,
-					"array": false,
-					"min": -9223372036854775808,
-					"max": 9223372036854775807,
-					"default": null
-				},
-				{
-					"key": "wordsFinished",
-					"type": "integer",
-					"status": "available",
-					"error": "",
-					"required": true,
-					"array": false,
-					"min": -9223372036854775808,
-					"max": 9223372036854775807,
-					"default": null
-				},
-				{
-					"key": "pagesFinished",
-					"type": "integer",
-					"status": "available",
-					"error": "",
-					"required": true,
-					"array": false,
-					"min": -9223372036854775808,
-					"max": 9223372036854775807,
-					"default": null
-				},
-				{
-					"key": "coins",
-					"type": "integer",
-					"status": "available",
-					"error": "",
-					"required": true,
-					"array": false,
-					"min": -9223372036854775808,
-					"max": 9223372036854775807,
-					"default": null
-				},
-				{
-					"key": "booksFinished",
-					"type": "integer",
-					"status": "available",
-					"error": "",
-					"required": true,
-					"array": false,
-					"min": -9223372036854775808,
-					"max": 9223372036854775807,
-					"default": null
-				},
-				{
-					"key": "currentQuest",
-					"type": "string",
-					"status": "available",
-					"error": "",
-					"required": false,
-					"array": false,
-					"size": 100000,
-					"default": null
-				},
-				{
-					"key": "badges",
-					"type": "string",
-					"status": "available",
-					"error": "",
-					"required": false,
-					"array": true,
-					"size": 255,
-					"default": null
-				}
-			],
-			"indexes": []
-		}
-	]
+    "projectId": "rewrite",
+    "projectName": "rewrite",
+    "functions": [
+        {
+            "$id": "addBook",
+            "name": "addBook",
+            "runtime": "node-18.0",
+            "execute": [
+                "users"
+            ],
+            "events": [],
+            "schedule": "",
+            "timeout": 900,
+            "enabled": true,
+            "logging": true,
+            "entrypoint": "src/main.js",
+            "commands": "npm install",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ],
+            "path": "functions/addBook"
+        }
+    ],
+    "buckets": [
+        {
+            "$id": "books",
+            "$createdAt": "2024-04-12T15:32:20.035+00:00",
+            "$updatedAt": "2024-04-12T15:32:55.126+00:00",
+            "$permissions": [
+                "create(\"any\")"
+            ],
+            "fileSecurity": false,
+            "name": "books",
+            "enabled": true,
+            "maximumFileSize": 150000000,
+            "allowedFileExtensions": [
+                "epub"
+            ],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "pages",
+            "$createdAt": "2024-04-13T01:27:09.046+00:00",
+            "$updatedAt": "2024-04-13T01:27:09.046+00:00",
+            "$permissions": [],
+            "fileSecurity": true,
+            "name": "pages",
+            "enabled": true,
+            "maximumFileSize": 50000000,
+            "allowedFileExtensions": [
+                "png"
+            ],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        }
+    ],
+    "databases": [
+        {
+            "$id": "main",
+            "name": "main",
+            "$createdAt": "2024-04-12T19:26:39.575+00:00",
+            "$updatedAt": "2024-04-12T19:26:39.575+00:00",
+            "enabled": true
+        }
+    ],
+    "collections": [
+        {
+            "$id": "books",
+            "$permissions": [],
+            "databaseId": "main",
+            "name": "books",
+            "enabled": true,
+            "documentSecurity": true,
+            "attributes": [
+                {
+                    "key": "title",
+                    "type": "string",
+                    "status": "available",
+                    "error": "",
+                    "required": true,
+                    "array": false,
+                    "size": 2048,
+                    "default": null
+                },
+                {
+                    "key": "author",
+                    "type": "string",
+                    "status": "available",
+                    "error": "",
+                    "required": true,
+                    "array": false,
+                    "size": 2048,
+                    "default": null
+                },
+                {
+                    "key": "publisher",
+                    "type": "string",
+                    "status": "available",
+                    "error": "",
+                    "required": true,
+                    "array": false,
+                    "size": 2048,
+                    "default": null
+                },
+                {
+                    "key": "ready",
+                    "type": "boolean",
+                    "status": "available",
+                    "error": "",
+                    "required": true,
+                    "array": false,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "pages",
+            "$permissions": [],
+            "databaseId": "main",
+            "name": "pages",
+            "enabled": true,
+            "documentSecurity": true,
+            "attributes": [
+                {
+                    "key": "bookId",
+                    "type": "string",
+                    "status": "available",
+                    "error": "",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "page",
+                    "type": "integer",
+                    "status": "available",
+                    "error": "",
+                    "required": true,
+                    "array": false,
+                    "min": -9223372036854775808,
+                    "max": 9223372036854775807,
+                    "default": null
+                },
+                {
+                    "key": "text",
+                    "type": "string",
+                    "status": "available",
+                    "error": "",
+                    "required": true,
+                    "array": false,
+                    "size": 1000000,
+                    "default": null
+                },
+                {
+                    "key": "words",
+                    "type": "integer",
+                    "status": "available",
+                    "error": "",
+                    "required": true,
+                    "array": false,
+                    "min": -9223372036854775808,
+                    "max": 9223372036854775807,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "finishes",
+            "$permissions": [
+                "create(\"users\")"
+            ],
+            "databaseId": "main",
+            "name": "finishes",
+            "enabled": true,
+            "documentSecurity": true,
+            "attributes": [
+                {
+                    "key": "bookId",
+                    "type": "string",
+                    "status": "available",
+                    "error": "",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "userId",
+                    "type": "string",
+                    "status": "available",
+                    "error": "",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "pageNumbers",
+                    "type": "integer",
+                    "status": "available",
+                    "error": "",
+                    "required": false,
+                    "array": true,
+                    "min": -9223372036854775808,
+                    "max": 9223372036854775807,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "profiles",
+            "$permissions": [
+                "create(\"users\")"
+            ],
+            "databaseId": "main",
+            "name": "profiles",
+            "enabled": true,
+            "documentSecurity": true,
+            "attributes": [
+                {
+                    "key": "lastStreakDate",
+                    "type": "datetime",
+                    "status": "available",
+                    "error": "",
+                    "required": false,
+                    "array": false,
+                    "format": "",
+                    "default": null
+                },
+                {
+                    "key": "streak",
+                    "type": "integer",
+                    "status": "available",
+                    "error": "",
+                    "required": true,
+                    "array": false,
+                    "min": -9223372036854775808,
+                    "max": 9223372036854775807,
+                    "default": null
+                },
+                {
+                    "key": "xp",
+                    "type": "integer",
+                    "status": "available",
+                    "error": "",
+                    "required": true,
+                    "array": false,
+                    "min": -9223372036854775808,
+                    "max": 9223372036854775807,
+                    "default": null
+                },
+                {
+                    "key": "wordsFinished",
+                    "type": "integer",
+                    "status": "available",
+                    "error": "",
+                    "required": true,
+                    "array": false,
+                    "min": -9223372036854775808,
+                    "max": 9223372036854775807,
+                    "default": null
+                },
+                {
+                    "key": "pagesFinished",
+                    "type": "integer",
+                    "status": "available",
+                    "error": "",
+                    "required": true,
+                    "array": false,
+                    "min": -9223372036854775808,
+                    "max": 9223372036854775807,
+                    "default": null
+                },
+                {
+                    "key": "coins",
+                    "type": "integer",
+                    "status": "available",
+                    "error": "",
+                    "required": true,
+                    "array": false,
+                    "min": -9223372036854775808,
+                    "max": 9223372036854775807,
+                    "default": null
+                },
+                {
+                    "key": "booksFinished",
+                    "type": "integer",
+                    "status": "available",
+                    "error": "",
+                    "required": true,
+                    "array": false,
+                    "min": -9223372036854775808,
+                    "max": 9223372036854775807,
+                    "default": null
+                },
+                {
+                    "key": "currentQuest",
+                    "type": "string",
+                    "status": "available",
+                    "error": "",
+                    "required": false,
+                    "array": false,
+                    "size": 100000,
+                    "default": null
+                },
+                {
+                    "key": "badges",
+                    "type": "string",
+                    "status": "available",
+                    "error": "",
+                    "required": false,
+                    "array": true,
+                    "size": 255,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        }
+    ]
 }
