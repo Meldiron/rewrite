@@ -1,0 +1,20 @@
+{
+  "name": "starter-template",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@google-cloud/vision": "^4.2.0",
+    "@gxl/epub-parser": "^2.0.4",
+    "axios": "^1.6.8",
+    "convertapi": "^1.14.0",
+    "node-appwrite": "^9.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.0"
+  }
+}

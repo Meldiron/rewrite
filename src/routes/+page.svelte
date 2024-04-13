@@ -1,0 +1,32 @@
+<script lang="ts">
+	import type { PageData } from './$types';
+
+	export let data: PageData;
+</script>
+
+<div class="hero min-h-screen bg-base-200">
+	<div class="hero-content text-center">
+		<div class="max-w-md">
+			<h1 class="text-5xl font-bold">Rewrite books</h1>
+			<p class="py-6 text-primary">
+				Practice typing skills and speed by rewritting books as you read them. Ue your own books for
+				learning or entertainment.
+			</p>
+			<div class="flex gap-4 w-full justify-center">
+				{#if data.user === null}
+					<a href="/auth/sign-in">
+						<button class="btn btn-active btn-ghost btn-wide">Sign In</button>
+					</a>
+
+					<a href="/auth/sign-in">
+						<button class="btn btn-active btn-outline btn-wide">Sign Up</button>
+					</a>
+				{:else}
+					<a href="/auth/sign-in">
+						<button class="btn btn-active btn-outline btn-wide">My library</button>
+					</a>
+				{/if}
+			</div>
+		</div>
+	</div>
+</div>
