@@ -1,4 +1,5 @@
 TODO: Update favicon and SEO stuff
+TODO: oprimize load functions with promise alls
 
 # create-svelte
 

@@ -6,8 +6,23 @@
 	import { invalidateAll } from '$app/navigation';
 	import { latinize } from '$lib/latinize';
 	import { hasStreak } from '$lib/utils';
+	import { onMount } from 'svelte';
 
 	export let data: PageData;
+
+	let previousPageEl: HTMLDivElement;
+
+	$: {
+		if (data) {
+			setTimeout(() => {
+				if (previousPageEl) {
+					previousPageEl.scrollTop = previousPageEl.scrollHeight;
+				}
+			}, 1);
+		}
+	}
+
+	onMount(() => {});
 
 	$: fileId = `${data.book.$id}-${data.page.page}`;
 	$: fileUrl = storage
@@ -234,7 +249,29 @@
 		</div>
 	{/if}
 
-	<div class="card relative p-10 rounded-md bg-base-100 shadow-xl p-3 text-xl">
+	{#if data.previousPage}
+		<div
+			class="bg-neutral text-xs border-white w-[fit-content] px-3 py-2 rounded-md rounded-b-none pb-3"
+		>
+			Previously read
+		</div>
+		<div bind:this={previousPageEl} class="relative max-h-[150px] overflow-y-scroll mb-4">
+			<div
+				class="card rounded-tl-none mt-0 bg-neutral p-3 text-md rounded-md shadow-xl text-base-content tracking-wide"
+			>
+				{#each data.previousPage.text.split('\n') as row}
+					<p>{row}</p>
+				{/each}
+			</div>
+		</div>
+	{/if}
+
+	<div
+		class="bg-base-100 text-xs border-white w-[fit-content] px-3 py-2 pb-1 rounded-md rounded-b-none pb-3"
+	>
+		Page to rewrite
+	</div>
+	<div class="card relative rounded-tl-none rounded-md bg-base-100 shadow-xl p-3 text-xl">
 		{#if data.isCompleted}
 			<div
 				class="absolute rounded-xl inset-0 bg-gradient-to-b from-[rgba(0,0,0,0.5)] via-[rgba(0,0,0,0.8)] to-[rgba(0,0,0,0.5)] flex items-start pt-4 justify-center pointer-events-none"

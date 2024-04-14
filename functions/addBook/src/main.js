@@ -118,6 +118,11 @@ export default async ({ req, res, log, error }) => {
     pageText = pageText.split('“').join('"');
     pageText = pageText.split(',,').join('"');
     pageText = pageText.split("''").join('"');
+    pageText = pageText.split("❝'").join('"');
+    pageText = pageText.split("❝'").join('"');
+    pageText = pageText.split("❞'").join('"');
+    pageText = pageText.split("–'").join('-');
+    pageText = pageText.split("…'").join('...');
 
     log(`Saving page text ${page}/${fileUrls.length}`);
 
