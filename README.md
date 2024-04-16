@@ -1,5 +1,8 @@
+TODO: When page finished, modal summary
+TODO: Public profile
+TODO: Info about CTRL/CMD+Enter
 TODO: Update favicon and SEO stuff
-TODO: oprimize load functions with promise alls
+TODO: optimize load functions with promise alls
 TODO: Completed books checkmark
 TODO: Unlocks for levels
 TODO: Quests
