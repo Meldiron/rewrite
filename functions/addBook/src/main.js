@@ -74,6 +74,7 @@ export default async ({ req, res, log, error }) => {
       author,
       publisher,
       ready: false,
+      pages: 0
     },
     [Permission.read(Role.user(userId))]
   );
@@ -155,6 +156,7 @@ export default async ({ req, res, log, error }) => {
 
   await databases.updateDocument('main', 'books', fileId, {
     ready: true,
+    pages: page
   });
 
   return res.send('OK');
