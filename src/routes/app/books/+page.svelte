@@ -3,6 +3,12 @@
 	import type { PageData } from './$types';
 
 	export let data: PageData;
+
+	function getFinishes(bookId: string) {
+		const finishes = data.finishes.documents.find((f) => f.bookId === bookId);
+		console.log(finishes ? finishes.pageNumbers.length : 0);
+		return finishes ? finishes.pageNumbers.length : 0;
+	}
 </script>
 
 <div class="max-w-2xl mx-auto">
@@ -76,6 +82,12 @@
 						</div>
 					</figure>
 					<div class="card-body">
+						<p class="text-content font-light text-xs uppercase -mt-2 tracking-widest">
+							{getFinishes(book.$id)} / {book.pages}
+						</p>
+						<progress class="progress w-full mb-2" value={getFinishes(book.$id)} max={book.pages}
+						></progress>
+
 						<h2 class="card-title text-primary">{book.title}</h2>
 						<div class="h-full">
 							<p class="text-semibold">{book.author}</p>

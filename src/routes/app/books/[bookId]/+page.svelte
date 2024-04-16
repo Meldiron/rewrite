@@ -35,11 +35,18 @@
 
 <div class="max-w-2xl mx-auto">
 	<div class="divider"><a href="/app/books" class="hover:underline">Books</a></div>
+
 	<h1 class="text-4xl font-semibold text-primary text-center my-8">
 		<span>{data.book.title}</span>
 	</h1>
 
-	<p class="text-center mb-6">
+	<progress
+		class="progress w-full mb-2"
+		value={data.finishedPageNumbers.length}
+		max={data.book.pages}
+	></progress>
+
+	<p class="text-content font-light text-xs uppercase tracking-widest text-center mb-6">
 		Completed {data.finishedPageNumbers.length} / {data.pages.total} pages
 	</p>
 
@@ -89,7 +96,9 @@
 		{/if}
 		<div class="form-control">
 			<label class="label cursor-pointer">
-				<span class="label-text text-primary mr-4">Hide completed ({data.finishedPageNumbers.length})</span>
+				<span class="label-text text-primary mr-4"
+					>Hide completed ({data.finishedPageNumbers.length})</span
+				>
 				<input type="checkbox" class="toggle" bind:checked={hideCompleted} />
 			</label>
 		</div>
@@ -121,7 +130,8 @@
 							<td class="float-right">
 								{#if !data.finishedPageNumbers.includes(page.page)}<a
 										href={`/app/books/${data.book.$id}/${page.page}`}
-										class={`btn btn-sm btn-ghost ${page.page === nextPage ? 'btn-active' : ''}`}>Rewrite page</a
+										class={`btn btn-sm btn-ghost ${page.page === nextPage ? 'btn-active' : ''}`}
+										>Rewrite page</a
 									>
 								{:else}
 									<a href={`/app/books/${data.book.$id}/${page.page}`} class="btn btn-sm btn-ghost"

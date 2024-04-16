@@ -12,17 +12,20 @@
 
 	let previousPageEl: HTMLDivElement;
 
-	$: {
-		if (data) {
-			setTimeout(() => {
-				if (previousPageEl) {
-					previousPageEl.scrollTop = previousPageEl.scrollHeight;
-				}
-			}, 1);
-		}
+	$: data, scrollToBottom();
+
+	function scrollToBottom() {
+		setTimeout(() => {
+			if (previousPageEl) {
+				previousPageEl.scrollTop = previousPageEl.scrollHeight;
+				console.log('Scrolled');
+			}
+		}, 1);
 	}
 
-	onMount(() => {});
+	onMount(() => {
+		scrollToBottom();
+	});
 
 	$: fileId = `${data.book.$id}-${data.page.page}`;
 	$: fileUrl = storage
@@ -122,22 +125,24 @@
 	}
 
 	async function previousWord(target: any) {
-		correctLetters = 0;
-		wrongLetters = 0;
-
 		activeWord--;
 
-		if (activeWord <= 0) {
-			activeWord = 0;
+		if (activeWord < 0) {
 			activeLine--;
+			activeWord = linesOfWords[activeLine].length - 1;
 		}
 
-		if (activeLine <= 0) {
+		if (activeLine < 0) {
 			activeLine = 0;
 			activeWord = 0;
 			correctLetters = 0;
 			wrongLetters = 0;
+			return;
 		}
+
+		wrongLetters = 0;
+		correctLetters = linesOfWords[activeLine][activeWord].length;
+		target.value = linesOfWords[activeLine][activeWord];
 	}
 
 	async function nextWord(target: any) {
@@ -197,11 +202,20 @@
 	function onKeyDown(e: any) {
 		if (e.target.value === '' && e.key.toLowerCase() === 'backspace') {
 			previousWord(e.target);
+			e.preventDefault();
 			return;
 		}
 
-		if (e.key.toLowerCase() === 'enter') {
-			nextWord(e.target);
+		if (
+			e.key.toLowerCase() === 'enter' &&
+			(e.target.value[e.target.value.length - 1] ?? '') !== ' '
+		) {
+			if (e.metaKey || e.ctrlKey) {
+				nextWord(e.target);
+			} else {
+				e.target.value += ' ';
+				handleWord(e.target.value, e.target);
+			}
 		}
 	}
 
