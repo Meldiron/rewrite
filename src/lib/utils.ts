@@ -24,10 +24,10 @@ export function isStreakEnded(streakDate: string | null) {
 	yesterdayBeginningOfDay.setDate(today.getDate() - 1);
 	yesterdayBeginningOfDay.setHours(0, 0, 0, 0);
 
-	if(date < yesterdayBeginningOfDay) {
+	if (date < yesterdayBeginningOfDay) {
 		return true;
 	}
-	
+
 	return false;
 }
 

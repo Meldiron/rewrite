@@ -4,9 +4,7 @@ async function forEachFile(storage, bucket, callback) {
   let cursor = null;
 
   do {
-    let queries = [
-      Query.limit(1000)
-    ];
+    let queries = [Query.limit(1000)];
 
     if (cursor) {
       queries.push(Query.cursorAfter(cursor));
@@ -30,9 +28,7 @@ async function forEachDocument(databases, collection, callback) {
   let cursor = null;
 
   do {
-    let queries = [
-      Query.limit(1000)
-    ];
+    let queries = [Query.limit(1000)];
 
     if (cursor) {
       queries.push(Query.cursorAfter(cursor));
@@ -61,19 +57,21 @@ export default async ({ req, res, log, error }) => {
   const storage = new Storage(client);
   const databases = new Databases(client);
 
-  log("Getting books");
+  log('Getting books');
   const booksResponse = await databases.listDocuments('main', 'books', [
-    Query.limit(10000)
+    Query.limit(10000),
   ]);
   const existingBookIds = booksResponse.documents.map((book) => book.$id);
 
-  log("Processing pages");
+  log('Processing pages');
   const dbPagesToDelete = [];
   await forEachDocument(databases, 'pages', async (doc) => {
     const docBookId = doc.bookId;
 
     if (!existingBookIds.includes(docBookId)) {
-      log(`Deleting page ${doc.$id} from book ${docBookId} as book does not exist anymore`);
+      log(
+        `Deleting page ${doc.$id} from book ${docBookId} as book does not exist anymore`
+      );
       dbPagesToDelete.push(doc.$id);
     }
   });
@@ -82,13 +80,15 @@ export default async ({ req, res, log, error }) => {
     await databases.deleteDocument('main', 'pages', toDelete);
   }
 
-  log("Processing finishes");
+  log('Processing finishes');
   const dbFinishesToDelete = [];
   await forEachDocument(databases, 'finishes', async (doc) => {
     const docBookId = doc.bookId;
 
     if (!existingBookIds.includes(docBookId)) {
-      log(`Deleting finish ${doc.$id} from book ${docBookId} as book does not exist anymore`);
+      log(
+        `Deleting finish ${doc.$id} from book ${docBookId} as book does not exist anymore`
+      );
       dbFinishesToDelete.push(doc.$id);
     }
   });
@@ -97,13 +97,15 @@ export default async ({ req, res, log, error }) => {
     await databases.deleteDocument('main', 'finishes', toDelete);
   }
 
-  log("Processing storage pages");
+  log('Processing storage pages');
   const storagePagesToDelete = [];
   await forEachFile(storage, 'pages', async (file) => {
     const fileBookId = file.$id.split('-')[0];
 
     if (!existingBookIds.includes(fileBookId)) {
-      log(`Deleting page ${file.$id} as book ${fileBookId} does not exist anymore`);
+      log(
+        `Deleting page ${file.$id} as book ${fileBookId} does not exist anymore`
+      );
       storagePagesToDelete.push(file.$id);
     }
   });
@@ -112,7 +114,7 @@ export default async ({ req, res, log, error }) => {
     await storage.deleteFile('pages', toDelete);
   }
 
-  log("Processing storage books");
+  log('Processing storage books');
   const storageBooksToDelete = [];
   await forEachFile(storage, 'books', async (file) => {
     const fileBookId = file.$id;
@@ -123,10 +125,9 @@ export default async ({ req, res, log, error }) => {
     }
   });
 
-
   for (const toDelete of storageBooksToDelete) {
     await storage.deleteFile('books', toDelete);
   }
 
   return res.send('OK');
-}
+};

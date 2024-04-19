@@ -16,17 +16,26 @@ async function getJobFromUuid(log, uuid, index = 0) {
   try {
     const convertRequest = new FormData();
     convertRequest.append('uuid', uuid);
-    const convertResponse = await axios.default.post('https://api.epub.to/v1/results/', convertRequest, {
-      headers: {
-        'Authorization': process.env.EPUB_TO_API_KEY
-      },
-    });
+    const convertResponse = await axios.default.post(
+      'https://api.epub.to/v1/results/',
+      convertRequest,
+      {
+        headers: {
+          Authorization: process.env.EPUB_TO_API_KEY,
+        },
+      }
+    );
 
     if (convertResponse.status !== 200) {
       throw new Error('Failed to get job status.');
     }
 
-    if (!convertResponse || !convertResponse.data || !convertResponse.data.files || convertResponse.data.files.length <= 0) {
+    if (
+      !convertResponse ||
+      !convertResponse.data ||
+      !convertResponse.data.files ||
+      convertResponse.data.files.length <= 0
+    ) {
       throw new Error('No files found yet.');
     }
 
@@ -36,7 +45,8 @@ async function getJobFromUuid(log, uuid, index = 0) {
   } catch (e) {
     log(e);
 
-    if (index > 200) { // 10 minutes
+    if (index > 200) {
+      // 10 minutes
       throw new Error('Failed to get job status.');
     }
 
@@ -87,10 +97,9 @@ export default async ({ req, res, log, error }) => {
     existedBefore = true;
 
     log('Found existing book');
-  } catch (err) { }
+  } catch (err) {}
 
   if (!existedBefore) {
-
     log('Extracting metadata');
 
     const epubObj = await parseEpub(`./job_${jobId}.epub`, {
@@ -116,7 +125,7 @@ export default async ({ req, res, log, error }) => {
         author,
         publisher,
         ready: false,
-        pages: 0
+        pages: 0,
       },
       [Permission.read(Role.user(userId))]
     );
@@ -124,7 +133,7 @@ export default async ({ req, res, log, error }) => {
 
   log('Converting source file');
 
-  let jobIdUuid = "";
+  let jobIdUuid = '';
   if (existedBefore && existingDoc.epubToJobId) {
     jobIdUuid = existingDoc.epubToJobId;
 
@@ -132,14 +141,21 @@ export default async ({ req, res, log, error }) => {
   } else {
     const convertRequest = new FormData();
     convertRequest.append('convert_to', 'epub-png');
-    convertRequest.append('files', new Blob([(await fs.readFile(`./job_${jobId}.epub`))]), `job_${jobId}.epub`);
-    const convertResponse = await axios.default.post('https://api.epub.to/v1/convert/', convertRequest, {
-      headers: {
-        'Authorization': process.env.EPUB_TO_API_KEY,
-        'Content-Type': 'multipart/form-data'
-
-      },
-    });
+    convertRequest.append(
+      'files',
+      new Blob([await fs.readFile(`./job_${jobId}.epub`)]),
+      `job_${jobId}.epub`
+    );
+    const convertResponse = await axios.default.post(
+      'https://api.epub.to/v1/convert/',
+      convertRequest,
+      {
+        headers: {
+          Authorization: process.env.EPUB_TO_API_KEY,
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
 
     if (convertResponse.status !== 200) {
       log(convertResponse.data);
@@ -149,7 +165,7 @@ export default async ({ req, res, log, error }) => {
     jobIdUuid = convertResponse.data.uuid;
 
     await databases.updateDocument('main', 'books', fileId, {
-      epubToJobId: jobIdUuid
+      epubToJobId: jobIdUuid,
     });
 
     log('New Job ID: ' + jobIdUuid);
@@ -158,12 +174,14 @@ export default async ({ req, res, log, error }) => {
   let fileUrls = await getJobFromUuid(log, jobIdUuid);
   fileUrls = fileUrls.map((url) => {
     let helperStr = url.split('job_')[1].split('.png')[0];
-    const pageNumber = helperStr.includes('_') ? (+(helperStr.split('_')[1]) + 1) : 1;
+    const pageNumber = helperStr.includes('_')
+      ? +helperStr.split('_')[1] + 1
+      : 1;
 
     return {
       url,
-      pageNumber
-    }
+      pageNumber,
+    };
   });
   fileUrls = fileUrls.sort((a, b) => a.pageNumber - b.pageNumber);
   fileUrls = fileUrls.map((f) => f.url);
@@ -177,13 +195,13 @@ export default async ({ req, res, log, error }) => {
     try {
       await databases.getDocument('main', 'pages', `${fileId}-${page}`);
       hasDocument = true;
-    } catch (err) { }
+    } catch (err) {}
 
     let hasFile = false;
     try {
       await storage.getFile('pages', `${fileId}-${page}`);
       hasFile = true;
-    } catch (err) { }
+    } catch (err) {}
 
     let pageBuffer = null;
     if (!hasDocument || !hasFile) {
@@ -253,7 +271,7 @@ export default async ({ req, res, log, error }) => {
 
   await databases.updateDocument('main', 'books', fileId, {
     ready: true,
-    pages: page
+    pages: page,
   });
 
   return res.send('OK');
