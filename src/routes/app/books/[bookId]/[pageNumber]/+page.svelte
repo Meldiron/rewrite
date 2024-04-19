@@ -10,7 +10,9 @@
 
 	export let data: PageData;
 
+	let currentMainTab: 'text' | 'screenshot' = 'text';
 	let previousPageEl: HTMLDivElement;
+	let inputEl: HTMLInputElement;
 
 	$: data, scrollToBottom();
 
@@ -218,7 +220,7 @@
 			(e.target.value[e.target.value.length - 1] ?? '') !== ' '
 		) {
 			if (e.metaKey || e.ctrlKey) {
-				nextWord(e.target);
+				onSkipWord();
 			} else {
 				e.target.value += ' ';
 				handleWord(e.target.value, e.target);
@@ -228,6 +230,34 @@
 
 	function onChange(e: any) {
 		handleWord(e.target.value, e.target);
+	}
+
+	let secondsLeft = 0;
+	let secondsInterval: any = null;
+	let canSkip = true;
+
+	function onSkipWord() {
+		if (!canSkip) {
+			return;
+		}
+
+		secondsLeft = 5;
+		canSkip = false;
+
+		if (secondsInterval) {
+			clearInterval(secondsInterval);
+			secondsInterval = null;
+		}
+		secondsInterval = setInterval(() => {
+			if (secondsLeft > 1) {
+				secondsLeft--;
+			} else {
+				canSkip = true;
+				clearInterval(secondsInterval);
+			}
+		}, 1000);
+
+		nextWord(inputEl);
 	}
 </script>
 
@@ -287,12 +317,28 @@
 		</div>
 	{/if}
 
-	<div
-		class="bg-base-100 text-xs border-white w-[fit-content] px-3 py-2 pb-1 rounded-md rounded-b-none pb-3"
-	>
-		Page to rewrite
+	<div class="flex gap-3">
+		<button
+			on:click={() => (currentMainTab = 'text')}
+			class={`${currentMainTab === 'text' ? 'bg-base-100' : 'bg-base-200'} text-xs border-white w-[fit-content] px-3 py-2 pb-1 rounded-md rounded-b-none pb-3`}
+		>
+			Page to rewrite
+		</button>
+		<button
+			on:click={() => (currentMainTab = 'screenshot')}
+			class={`${currentMainTab === 'screenshot' ? 'bg-base-100' : 'bg-base-200'} text-xs border-white w-[fit-content] px-3 py-2 pb-1 rounded-md rounded-b-none pb-3`}
+		>
+			Book screenshot
+		</button>
 	</div>
-	<div class="card relative rounded-tl-none rounded-md bg-base-100 shadow-xl p-3 text-xl">
+	<div
+		class={`${currentMainTab === 'screenshot' ? '' : 'hidden'} card relative rounded-tl-none rounded-md bg-base-100 shadow-xl p-3 text-xl`}
+	>
+		<img src={fileUrl} alt="Screenshot" class="rounded-md" />
+	</div>
+	<div
+		class={`${currentMainTab === 'text' ? '' : 'hidden'} card relative rounded-tl-none rounded-md bg-base-100 shadow-xl p-3 text-xl`}
+	>
 		{#if data.isCompleted}
 			<div
 				class="absolute rounded-xl inset-0 bg-gradient-to-b from-[rgba(0,0,0,0.5)] via-[rgba(0,0,0,0.8)] to-[rgba(0,0,0,0.5)] flex items-start pt-4 justify-center pointer-events-none"
@@ -323,9 +369,10 @@
 </div>
 
 <div
-	class="fixed bottom-0 p-6 left-0 w-full rounded-t-xl flex justify-center backdrop-blur-md bg-black bg-opacity-25"
+	class="fixed bottom-0 p-6 left-0 w-full rounded-t-xl flex gap-4 justify-center backdrop-blur-md bg-black bg-opacity-25"
 >
 	<input
+		bind:this={inputEl}
 		disabled={data.isCompleted}
 		on:keydown={onKeyDown}
 		on:input={onChange}
@@ -334,27 +381,16 @@
 		placeholder="Type here"
 		class="input input-lg border-3 input-bordered w-full"
 	/>
-</div>
 
-<div class="fixed right-0 top-0 h-full flex items-center pointer-events-none">
-	<div
-		class="indicator max-h-[75vh] rounded-xl rounded-r-none transform translate-x-[70%] transition duration-500 hover:translate-x-[0%] h-full pointer-events-auto"
+	<button
+		disabled={!canSkip}
+		on:click={onSkipWord}
+		class={`btn btn-lg btn-ghost btn-active text-sm ${canSkip ? '' : '!text-white !text-opacity-60'}`}
 	>
-		<span
-			class="pointer indicator-item indicator-middle indicator-start btn btn-circle btn-active btn-primary"
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke-width="1.5"
-				stroke="currentColor"
-				class="w-5 h-5"
-			>
-				<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-			</svg>
-		</span>
-
-		<img src={fileUrl} alt="Screenshot" class="rounded-xl rounded-r-none" />
-	</div>
+		{#if canSkip}
+			Skip word
+		{:else}
+			Wait {secondsLeft} {secondsLeft === 1 ? 'second' : 'seconds'}
+		{/if}
+	</button>
 </div>

@@ -12,7 +12,7 @@
 				Practice typing skills and speed by rewritting books as you read them. Ue your own books for
 				learning or entertainment.
 			</p>
-			<div class="flex gap-4 w-full justify-center">
+			<div class="flex flex-col sm:flex-row gap-4 w-full justify-center">
 				{#if data.user === null}
 					<a href="/auth/sign-in">
 						<button class="btn btn-active btn-ghost btn-wide">Sign In</button>

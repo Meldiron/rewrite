@@ -56,7 +56,7 @@
 		<span>Pages</span><span class=" animate-cursor text-primary">_</span>
 	</h1>
 
-	<div class="mb-4 flex justify-between items-center gap-4">
+	<div class="mb-4 flex flex-col sm:flex-row justify-between items-center gap-4">
 		{#if nextPage === null}
 			<a href={`/app/books/${data.book.$id}/1`} class="btn btn-primary">
 				<svg
