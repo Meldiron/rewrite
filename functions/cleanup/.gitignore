@@ -1,8 +1,5 @@
 src/test.js
 
-# Dev files
-gc.json
-
 # Logs
 logs
 *.log

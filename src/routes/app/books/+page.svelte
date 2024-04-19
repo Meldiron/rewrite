@@ -51,35 +51,37 @@
 					>
 					<span class="text-info"
 						><b class="font-semibold">{book.title}</b> is being processed. Please wait. It usually takes
-						2 minutes per 100 pages of e-book.</span
+						5 minutes per 100 pages of e-book.</span
 					>
 				</div>
 			{:else}
 				<div class="card lg:card-side bg-base-100 shadow-xl">
 					<figure>
-						<div class="w-full aspect-[3/4] !w-[250px]">
-							<img
-								class="object-cover w-full h-full object-contain transform transition duration-300 scale-[100%] hover:scale-[110%]"
-								src={storage
-									.getFilePreview(
-										'pages',
-										`${book.$id}-1`,
-										1280,
-										undefined,
-										undefined,
-										undefined,
-										undefined,
-										undefined,
-										undefined,
-										undefined,
-										undefined,
-										undefined,
-										'webp'
-									)
-									.toString()}
-								alt="Book"
-							/>
-						</div>
+						<a href={`/app/books/${book.$id}`}>
+							<div class="w-full aspect-[3/4] !w-[250px]">
+								<img
+									class="object-cover w-full h-full object-contain transform transition duration-300 scale-[100%] hover:scale-[110%]"
+									src={storage
+										.getFilePreview(
+											'pages',
+											`${book.$id}-1`,
+											1280,
+											undefined,
+											undefined,
+											undefined,
+											undefined,
+											undefined,
+											undefined,
+											undefined,
+											undefined,
+											undefined,
+											'webp'
+										)
+										.toString()}
+									alt="Book"
+								/>
+							</div>
+						</a>
 					</figure>
 					<div class="card-body">
 						<p class="text-content font-light text-xs uppercase -mt-2 tracking-widest">

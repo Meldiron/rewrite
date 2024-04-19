@@ -8,6 +8,7 @@
 
 	let submitting = false;
 	let files: any = null;
+	let fileId = '';
 
 	async function getBookDocument(id: string) {
 		try {
@@ -28,15 +29,20 @@
 		submitting = true;
 
 		try {
-			$toastStore = { type: 'info', text: 'Uploading book...' };
-
-			const storageBook = await storage.createFile('books', ID.unique(), files[0]);
+			let submitId = '';
+			if (fileId) {
+				submitId = fileId;
+			} else {
+				$toastStore = { type: 'info', text: 'Uploading book...' };
+				const storageBook = await storage.createFile('books', ID.unique(), files[0]);
+				submitId = storageBook.$id;
+			}
 
 			$toastStore = { type: 'info', text: 'Getting book details...' };
 
-			await functions.createExecution('addBook', storageBook.$id, true);
+			await functions.createExecution('addBook', submitId, true);
 
-			await getBookDocument(storageBook.$id);
+			await getBookDocument(submitId);
 
 			$toastStore = { type: 'success', text: 'Book added.' };
 
@@ -60,6 +66,20 @@
 					<span class="label-text">Pick .epub file</span>
 				</div>
 				<input bind:files type="file" class="file-input file-input-bordered w-full" />
+			</label>
+
+			<div class="divider">OR</div>
+
+			<label class="form-control w-full max-w-xs">
+				<div class="label">
+					<span class="label-text">Enter file ID</span>
+				</div>
+				<input
+					bind:value={fileId}
+					type="text"
+					placeholder="File ID"
+					class="input input-bordered w-full max-w-xs"
+				/>
 			</label>
 
 			<button type="submit" class="mt-3 btn btn-primary btn-block" disabled={submitting}

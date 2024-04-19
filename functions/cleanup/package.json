@@ -8,9 +8,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@google-cloud/vision": "^4.2.0",
-    "@gxl/epub-parser": "^2.0.4",
-    "axios": "^1.6.8",
+    "form-data": "^4.0.0",
     "node-appwrite": "^11.1.1"
   },
   "devDependencies": {
