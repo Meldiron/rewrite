@@ -13,6 +13,24 @@ export function hasStreak(streakDate: string | null) {
 	);
 }
 
+export function isStreakEnded(streakDate: string | null) {
+	if (!streakDate) {
+		return false;
+	}
+
+	const date = new Date(streakDate);
+	const today = new Date();
+	const yesterdayBeginningOfDay = new Date();
+	yesterdayBeginningOfDay.setDate(today.getDate() - 1);
+	yesterdayBeginningOfDay.setHours(0, 0, 0, 0);
+
+	if(date < yesterdayBeginningOfDay) {
+		return true;
+	}
+	
+	return false;
+}
+
 export function xpNeededForLevel(level: number) {
 	let xpNeeded = 0;
 

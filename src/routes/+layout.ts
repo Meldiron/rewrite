@@ -1,6 +1,7 @@
 import { ID, type Models } from 'appwrite';
 import type { LayoutLoad } from './$types';
 import { account, databases } from '$lib/appwrite';
+import { isStreakEnded } from '$lib/utils';
 
 export let ssr = false;
 
@@ -36,6 +37,18 @@ export const load: LayoutLoad = async () => {
 			};
 			await account.updatePrefs(newPrefs);
 			user.prefs = newPrefs;
+		}
+	}
+
+	if (profile) {
+		if (isStreakEnded(profile.lastStreakDate)) {
+			profile.streak = 0;
+			profile.lastStreakDate = null;
+
+			await databases.updateDocument('main', 'profiles', profile.$id, {
+				streak: 0,
+				lastStreakDate: null
+			});
 		}
 	}
 

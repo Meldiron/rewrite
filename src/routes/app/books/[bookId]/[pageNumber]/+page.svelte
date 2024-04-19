@@ -5,7 +5,7 @@
 	import type { PageData } from './$types';
 	import { invalidateAll } from '$app/navigation';
 	import { latinize } from '$lib/latinize';
-	import { hasStreak } from '$lib/utils';
+	import { hasStreak, isStreakEnded } from '$lib/utils';
 	import { onMount } from 'svelte';
 
 	export let data: PageData;
@@ -110,8 +110,15 @@
 			booksFinished += 1;
 		}
 
+		let lastStreakDate: string | null = new Date().toISOString();
+
+		if (isStreakEnded(data.profile.lastStreakDate)) {
+			streak = 0;
+			lastStreakDate = null;
+		}
+
 		await databases.updateDocument('main', 'profiles', data.profile.$id, {
-			lastStreakDate: new Date().toISOString(),
+			lastStreakDate,
 			streak,
 			xp,
 			wordsFinished,
