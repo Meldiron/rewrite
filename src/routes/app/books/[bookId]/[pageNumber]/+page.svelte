@@ -10,6 +10,12 @@
 
 	export let data: PageData;
 
+	let endLevelModalOpened = true;
+	let endLevelModalData = {
+		xp: 0,
+		words: 0
+	};
+
 	let currentMainTab: 'text' | 'screenshot' = 'text';
 	let previousPageEl: HTMLDivElement;
 	let inputEl: HTMLInputElement;
@@ -98,11 +104,14 @@
 			streak++;
 		}
 
+		const xpToAdd = data.page.text.split(' ').join('').split('\n').join('').length;
+		const wordsToAdd = data.page.text.split('\n').join(' ').split(' ').length;
+
 		let xp = data.profile.xp ?? 0;
-		xp += data.page.text.split(' ').join('').split('\n').join('').length;
+		xp += xpToAdd;
 
 		let wordsFinished = data.profile.wordsFinished ?? 0;
-		wordsFinished += data.page.text.split('\n').join(' ').split(' ').length;
+		wordsFinished += wordsToAdd;
 
 		let pagesFinished = data.profile.pagesFinished ?? 0;
 		pagesFinished += 1;
@@ -131,6 +140,10 @@
 		await invalidateAll();
 
 		$toastStore = { type: 'success', text: 'Page marked as completed.' };
+
+		endLevelModalOpened = true;
+		endLevelModalData.xp = xpToAdd;
+		endLevelModalData.words = wordsToAdd;
 	}
 
 	async function previousWord(target: any) {
@@ -415,3 +428,40 @@
 		{/if}
 	</button>
 </div>
+
+{#if endLevelModalOpened}
+	<div
+		style="opacity: 100%; pointer-events: auto;"
+		class="z-[200] modal modal-bottom sm:modal-middle"
+	>
+		<div class="modal-box">
+			<h3 class="font-bold text-lg">Page complered</h3>
+			<p class="py-4 text-primary">You have successfully rewritten a page and earned rewards.</p>
+
+			<ul class="steps steps-vertical">
+				<li class="step">
+					<div class="flex gap-4 items-center">
+						<span>Level</span> <kbd class="kbd">+{endLevelModalData.xp} XP</kbd>
+					</div>
+				</li>
+				<li class="step">
+					<div class="flex gap-4 items-center">
+						<span>Words</span> <kbd class="kbd">+{endLevelModalData.words}</kbd>
+					</div>
+				</li>
+				<li class="step">
+					<div class="flex gap-4 items-center"><span>Pages</span> <kbd class="kbd">+1</kbd></div>
+				</li>
+			</ul>
+
+			<div class="modal-action">
+				<button on:click={() => (endLevelModalOpened = false)} class="btn">Close</button>
+				<a
+					on:click={() => (endLevelModalOpened = false)}
+					href="/app/unlocks"
+					class="btn btn-primary">Next Page</a
+				>
+			</div>
+		</div>
+	</div>
+{/if}

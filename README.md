@@ -1,7 +1,5 @@
-TODO: When page finished, modal summary
-TODO: Public profile
 TODO: Change book details (tiitle, author, publisher)
-TODO: optimize load functions with promise alls
+TODO: Retry book addition? 15 min ain't enough. When in waiiting state, show ETA date when finished
 
 ---
 
