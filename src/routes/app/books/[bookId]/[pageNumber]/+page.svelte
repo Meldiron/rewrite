@@ -10,7 +10,7 @@
 
 	export let data: PageData;
 
-	let endLevelModalOpened = true;
+	let endLevelModalOpened = false;
 	let endLevelModalData = {
 		xp: 0,
 		words: 0
