@@ -1,32 +1,22 @@
 TODO: When page finished, modal summary
 TODO: Public profile
-TODO: Info about CTRL/CMD+Enter
-TODO: Update favicon and SEO stuff
+TODO: Change book details (tiitle, author, publisher)
 TODO: optimize load functions with promise alls
+
+---
+
+TODO: Update favicon and SEO stuff
 TODO: Completed books checkmark
-TODO: Unlocks for levels
-TODO: Quests
-TODO: Badges
+TODO: Quests (with level unlock)
+TODO: Quest points store
+TODO: Badges (with level unlock), monthly too?
 
 ```markdown
-- Badges
-- Badges on profile
-- Monthly badges?
-
-* coins
-* currentQuest
+- coins
+- currentQuest
   [100,500,1000] words [without mistake]
   [10,50,100] {5-10}+ character words [without mistake]
   [3,5,10] pages
-
-Progress Bars - In views
-Unlockable content
-Store
-
-levels rewards
-unfinished page slots
-more quests to pick from
-more quest difficulty
 ```
 
 # create-svelte

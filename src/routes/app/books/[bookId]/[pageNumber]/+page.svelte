@@ -5,7 +5,7 @@
 	import type { PageData } from './$types';
 	import { invalidateAll } from '$app/navigation';
 	import { latinize } from '$lib/latinize';
-	import { hasStreak, isStreakEnded } from '$lib/utils';
+	import { getLevel, hasStreak, isStreakEnded } from '$lib/utils';
 	import { onMount } from 'svelte';
 
 	export let data: PageData;
@@ -190,10 +190,20 @@
 		for (const letter of letters) {
 			const correctLetter = currentWord[i];
 
-			if (
-				latinize((letter ?? '').toLowerCase()) === latinize((correctLetter ?? '').toLowerCase()) &&
-				wrongLetters === 0
-			) {
+			let letterCopy = letter ?? '';
+			let correctLetterCopy = correctLetter ?? '';
+
+			if (data.user?.prefs.accentSensitivity !== true) {
+				letterCopy = latinize(letterCopy);
+				correctLetterCopy = latinize(correctLetterCopy);
+			}
+
+			if (data.user?.prefs.caseSensitivity !== true) {
+				letterCopy = letterCopy.toLowerCase();
+				correctLetterCopy = correctLetterCopy.toLowerCase();
+			}
+
+			if (letterCopy === correctLetterCopy && wrongLetters === 0) {
 				correctLetters++;
 			} else {
 				wrongLetters++;
@@ -241,7 +251,18 @@
 			return;
 		}
 
-		secondsLeft = 5;
+		const currentLevel = getLevel(data.profile.xp);
+
+		secondsLeft =
+			currentLevel >= 100
+				? 1
+				: currentLevel >= 50
+					? 3
+					: currentLevel >= 25
+						? 5
+						: currentLevel >= 10
+							? 10
+							: 15;
 		canSkip = false;
 
 		if (secondsInterval) {

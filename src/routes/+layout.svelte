@@ -1,18 +1,18 @@
 <script lang="ts">
 	import { goto, invalidate, invalidateAll } from '$app/navigation';
 	import { account } from '$lib/appwrite';
-	import { toastStore } from '$lib/stores';
+	import {
+		leftMenuStore,
+		levelModalStore,
+		profileMenuStore,
+		streakModalStore,
+		toastStore
+	} from '$lib/stores';
 	import { getExtraXp, getLevel, getLevelProgress, getXpRemaining, hasStreak } from '$lib/utils';
 	import '../app.css';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-
-	let streakModal: HTMLDialogElement;
-	let levelModal: HTMLDialogElement;
-	let leftMenu: HTMLInputElement;
-	let userMenu: HTMLInputElement;
-	let activeUserTab = 'stats';
 
 	let isSigningOut = false;
 
@@ -30,7 +30,7 @@
 			$toastStore = err.message || err || 'An error occurred';
 		} finally {
 			isSigningOut = false;
-			userMenu.checked = false;
+			$profileMenuStore.opened = false;
 		}
 	}
 
@@ -43,6 +43,20 @@
 		}
 
 		return 'alert-base-100 bg-base-100 border-base-100 text-primary';
+	}
+
+	async function setAccentSensitivity(e: any) {
+		const prefs = data.user?.prefs ?? {};
+		prefs.accentSensitivity = e.target.checked;
+		await account.updatePrefs(prefs);
+		await invalidateAll();
+	}
+
+	async function setCaseSensitivity(e: any) {
+		const prefs = data.user?.prefs ?? {};
+		prefs.caseSensitivity = e.target.checked;
+		await account.updatePrefs(prefs);
+		await invalidateAll();
 	}
 </script>
 
@@ -72,7 +86,7 @@
 	<div class="navbar-end gap-2">
 		{#if data.profile}
 			<button
-				on:click={() => streakModal.showModal()}
+				on:click={() => ($streakModalStore.opened = true)}
 				class={`relative btn btn-error btn-circle ${hasStreak(data.profile.lastStreakDate) ? '' : 'btn-outline'}`}
 			>
 				<svg
@@ -92,7 +106,10 @@
 				</div>
 			</button>
 
-			<button on:click={() => levelModal.showModal()} class="btn btn-circle btn-ghost btn-outline">
+			<button
+				on:click={() => ($levelModalStore.opened = true)}
+				class="btn btn-circle btn-ghost btn-outline"
+			>
 				<div
 					class="radial-progress"
 					style={`--value:${getLevelProgress(data.profile.xp)}; --size:2.7rem; --thickness: 3px;`}
@@ -157,13 +174,18 @@
 
 <div class="dropdown">
 	<div class="drawer z-[100]">
-		<input bind:this={leftMenu} id="left-menu" type="checkbox" class="drawer-toggle" />
+		<input
+			bind:checked={$leftMenuStore.opened}
+			id="left-menu"
+			type="checkbox"
+			class="drawer-toggle"
+		/>
 		<div class="drawer-content"></div>
 		<div class="drawer-side">
 			<label for="left-menu" aria-label="close sidebar" class="drawer-overlay"></label>
 			<ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content gap-2">
 				<li>
-					<a class="p-3" href="/" on:click={() => (leftMenu.checked = false)}>
+					<a class="p-3" href="/" on:click={() => ($leftMenuStore.opened = false)}>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							class="h-5 w-5"
@@ -182,7 +204,7 @@
 				</li>
 
 				<li>
-					<a class="p-3" href="/app/books" on:click={() => (leftMenu.checked = false)}>
+					<a class="p-3" href="/app/books" on:click={() => ($leftMenuStore.opened = false)}>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							fill="none"
@@ -203,7 +225,7 @@
 				</li>
 
 				<li>
-					<a class="p-3" href="/app/unlocks" on:click={() => (leftMenu.checked = false)}>
+					<a class="p-3" href="/app/unlocks" on:click={() => ($leftMenuStore.opened = false)}>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							fill="none"
@@ -252,7 +274,12 @@
 
 {#if data.profile && data.user}
 	<div class="drawer drawer-end z-[100]">
-		<input bind:this={userMenu} id="user-menu" type="checkbox" class="drawer-toggle" />
+		<input
+			bind:checked={$profileMenuStore.opened}
+			id="user-menu"
+			type="checkbox"
+			class="drawer-toggle"
+		/>
 		<div class="drawer-content"></div>
 		<div class="drawer-side">
 			<label for="user-menu" aria-label="close sidebar" class="drawer-overlay"></label>
@@ -260,26 +287,91 @@
 				<div role="tablist" class="tabs tabs-bordered">
 					<button
 						role="tab"
-						on:click={() => (activeUserTab = 'stats')}
-						class={`tab ${activeUserTab === 'stats' ? 'tab-active' : ''}`}>Stats</button
+						on:click={() => ($profileMenuStore.tab = 'stats')}
+						class={`tab ${$profileMenuStore.tab === 'stats' ? 'tab-active' : ''}`}>Stats</button
 					>
 					<button
 						role="tab"
-						on:click={() => (activeUserTab = 'quests')}
-						class={`tab ${activeUserTab === 'quests' ? 'tab-active' : ''}`}>Quests</button
+						on:click={() => ($profileMenuStore.tab = 'quests')}
+						class={`tab ${$profileMenuStore.tab === 'quests' ? 'tab-active' : ''}`}>Quests</button
 					>
 					<button
 						role="tab"
-						on:click={() => (activeUserTab = 'settings')}
-						class={`tab ${activeUserTab === 'settings' ? 'tab-active' : ''}`}>Settings</button
+						on:click={() => ($profileMenuStore.tab = 'settings')}
+						class={`tab ${$profileMenuStore.tab === 'settings' ? 'tab-active' : ''}`}
+						>Settings</button
 					>
 				</div>
 				<div class="mt-4">
-					{#if activeUserTab === 'settings'}
+					{#if $profileMenuStore.tab === 'settings'}
+						<div class="flex flex-col gap-3 rounded-xl mb-6">
+							<div class="form-control">
+								<label class="label cursor-pointer">
+									<span class="label-text">Case sensitivity</span>
+									{#if getLevel(data.profile.xp) >= 5}
+										<input
+											checked={data.user.prefs.caseSensitivity ?? false}
+											on:change={(e) => setCaseSensitivity(e)}
+											type="checkbox"
+											class="toggle"
+										/>
+									{:else}
+										<a href="/app/unlocks" on:click={() => ($profileMenuStore.opened = false)}>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke-width="1.5"
+												stroke="currentColor"
+												class="w-6 h-6 text-error"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
+												/>
+											</svg>
+										</a>
+									{/if}
+								</label>
+							</div>
+
+							<div class="form-control">
+								<label class="label cursor-pointer">
+									<span class="label-text">Accent sensitivity</span>
+									{#if getLevel(data.profile.xp) >= 5}
+										<input
+											checked={data.user.prefs.accentSensitivity ?? false}
+											on:change={(e) => setAccentSensitivity(e)}
+											type="checkbox"
+											class="toggle"
+										/>
+									{:else}
+										<a href="/app/unlocks" on:click={() => ($profileMenuStore.opened = false)}>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke-width="1.5"
+												stroke="currentColor"
+												class="w-6 h-6 text-error"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
+												/>
+											</svg>
+										</a>
+									{/if}
+								</label>
+							</div>
+						</div>
+
 						<button on:click={signOut} disabled={isSigningOut} class="btn btn-active btn-block"
 							>Sign out</button
 						>
-					{:else if activeUserTab === 'stats'}
+					{:else if $profileMenuStore.tab === 'stats'}
 						<div class="stat">
 							<div class="stat-figure text-neutral-content">
 								<svg
@@ -344,7 +436,7 @@
 						<div class="divider">Badges</div>
 
 						<p class="text-center opacity-50">Coming soon...</p>
-					{:else if activeUserTab === 'quests'}
+					{:else if $profileMenuStore.tab === 'quests'}
 						<p class="text-center opacity-50">Coming soon...</p>
 					{/if}
 				</div>
@@ -352,103 +444,103 @@
 		</div>
 	</div>
 
-	<dialog
-		bind:this={streakModal}
-		id="streak-modal"
-		class="z-[200] modal modal-bottom sm:modal-middle"
-	>
-		<div class="modal-box">
-			<h3 class="font-bold text-lg">Streaks</h3>
-			<p class="py-4 text-primary">
-				Rewrite at least one page every day, and increase your streak by one point each time. High
-				streaks show dedication and give profile badges.
-			</p>
-			<p>
-				Your current streak is: <span class="text-xl font-bold">{data.profile.streak}</span>
-			</p>
+	{#if $streakModalStore.opened}
+		<div
+			style="opacity: 100%; pointer-events: auto;"
+			class="z-[200] modal modal-bottom sm:modal-middle"
+		>
+			<div class="modal-box">
+				<h3 class="font-bold text-lg">Streaks</h3>
+				<p class="py-4 text-primary">
+					Rewrite at least one page every day, and increase your streak by one point each time. High
+					streaks show dedication and give profile badges.
+				</p>
+				<p>
+					Your current streak is: <span class="text-xl font-bold">{data.profile.streak}</span>
+				</p>
 
-			{#if !hasStreak(data.profile.lastStreakDate)}
-				<div role="alert" class="alert alert-error mt-4">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="stroke-current shrink-0 h-6 w-6"
-						fill="none"
-						viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-						/></svg
-					>
-					<span
-						>You haven't completed streak today Rewrite a page to increase your streak by 1 point.</span
-					>
-				</div>
-			{:else}
-				<div role="alert" class="alert mt-4">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						fill="none"
-						viewBox="0 0 24 24"
-						class="stroke-info shrink-0 w-6 h-6"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-						></path></svg
-					>
-					<span class="text-primary">You have completed streak today. Come back tomorrow.</span>
-				</div>
-			{/if}
+				{#if !hasStreak(data.profile.lastStreakDate)}
+					<div role="alert" class="alert alert-error mt-4">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="stroke-current shrink-0 h-6 w-6"
+							fill="none"
+							viewBox="0 0 24 24"
+							><path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+							/></svg
+						>
+						<span
+							>You haven't completed streak today Rewrite a page to increase your streak by 1 point.</span
+						>
+					</div>
+				{:else}
+					<div role="alert" class="alert mt-4">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							class="stroke-info shrink-0 w-6 h-6"
+							><path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+							></path></svg
+						>
+						<span class="text-primary">You have completed streak today. Come back tomorrow.</span>
+					</div>
+				{/if}
 
-			<div class="modal-action">
-				<form method="dialog">
-					<button class="btn">Close</button>
-				</form>
+				<div class="modal-action">
+					<button on:click={() => ($streakModalStore.opened = false)} class="btn">Close</button>
+				</div>
 			</div>
 		</div>
-	</dialog>
+	{/if}
 
-	<dialog
-		bind:this={levelModal}
-		id="level-modal"
-		class="z-[200] modal modal-bottom sm:modal-middle"
-	>
-		<div class="modal-box">
-			<h3 class="font-bold text-lg">Level</h3>
-			<p class="py-4 text-primary">
-				Earn points for each rewritten letter and level up. There are rewards at specific level
-				minestones.
-			</p>
+	{#if $levelModalStore.opened}
+		<div
+			style="opacity: 100%; pointer-events: auto;"
+			class="z-[200] modal modal-bottom sm:modal-middle"
+		>
+			<div class="modal-box">
+				<h3 class="font-bold text-lg">Level</h3>
+				<p class="py-4 text-primary">
+					Earn points for each rewritten letter and level up. There are rewards at specific level
+					minestones.
+				</p>
 
-			<div class="stats shadow w-full">
-				<div class="stat pl-0">
-					<div class="stat-title">Current level</div>
-					<div class="stat-value">{getLevel(data.profile.xp)}</div>
-					<div class="stat-desc">and {getExtraXp(data.profile.xp)} points</div>
+				<div class="stats shadow w-full">
+					<div class="stat pl-0">
+						<div class="stat-title">Current level</div>
+						<div class="stat-value">{getLevel(data.profile.xp)}</div>
+						<div class="stat-desc">and {getExtraXp(data.profile.xp)} points</div>
+					</div>
+
+					<div class="stat float-right text-right pr-0">
+						<div class="stat-title">Remaining points</div>
+						<div class="stat-value">{getXpRemaining(data.profile.xp)}</div>
+						<div class="stat-desc">to reach level {getLevel(data.profile.xp) + 1}</div>
+					</div>
 				</div>
 
-				<div class="stat float-right text-right pr-0">
-					<div class="stat-title">Remaining points</div>
-					<div class="stat-value">{getXpRemaining(data.profile.xp)}</div>
-					<div class="stat-desc">to reach level {getLevel(data.profile.xp) + 1}</div>
+				<progress class="progress w-full" value={getLevelProgress(data.profile.xp)} max={100}
+				></progress>
+
+				<div class="modal-action">
+					<a
+						on:click={() => ($levelModalStore.opened = false)}
+						href="/app/unlocks"
+						class="btn btn-primary">Show unlocks</a
+					>
+
+					<button on:click={() => ($levelModalStore.opened = false)} class="btn">Close</button>
 				</div>
-			</div>
-
-			<progress class="progress w-full" value={getLevelProgress(data.profile.xp)} max={100}
-			></progress>
-
-			<div class="modal-action">
-				<a on:click={() => levelModal.close()} href="/app/unlocks" class="btn btn-primary"
-					>Show unlocks</a
-				>
-
-				<form method="dialog">
-					<button class="btn">Close</button>
-				</form>
 			</div>
 		</div>
-	</dialog>
+	{/if}
 {/if}

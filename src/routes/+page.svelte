@@ -9,8 +9,8 @@
 		<div class="max-w-md">
 			<h1 class="text-5xl font-bold">Rewrite books</h1>
 			<p class="py-6 text-primary">
-				Practice typing skills and speed by rewritting books as you read them. Ue your own books for
-				learning or entertainment.
+				Practice typing skills and speed by rewritting books as you read them. Use your own books
+				for learning or entertainment.
 			</p>
 			<div class="flex flex-col sm:flex-row gap-4 w-full justify-center">
 				{#if data.user === null}
