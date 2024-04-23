@@ -1,3 +1,14 @@
+Badges:
+- Books/pages/Words
+- words without mistake
+- words of length X
+- WPM (words per minute)
+- use X skips
+- X words with case sentivity
+- X words with accent senstivity
+- 
+
+
 TODO: Change book details (tiitle, author, publisher)
 TODO: Retry book addition? 15 min ain't enough. When in waiiting state, show ETA date when finished
 
@@ -8,6 +19,7 @@ TODO: Completed books checkmark
 TODO: Quests (with level unlock)
 TODO: Quest points store
 TODO: Badges (with level unlock), monthly too?
+TODO: Community goals
 
 ```markdown
 - coins
