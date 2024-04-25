@@ -1,13 +1,12 @@
 import {
   Client,
   Databases,
-  ID,
-  InputFile,
+  Functions,
   Permission,
   Role,
   Storage,
+  Users,
 } from 'node-appwrite';
-import { ImageAnnotatorClient } from '@google-cloud/vision';
 import fs from 'fs/promises';
 import * as axios from 'axios';
 import { parseEpub } from '@gxl/epub-parser';
@@ -60,8 +59,6 @@ export default async ({ req, res, log, error }) => {
 
   log('Starting ' + jobId);
 
-  const googleClient = new ImageAnnotatorClient();
-
   const client = new Client()
     .setEndpoint('https://cloud.appwrite.io/v1')
     .setProject(process.env.APPWRITE_FUNCTION_PROJECT_ID)
@@ -69,13 +66,21 @@ export default async ({ req, res, log, error }) => {
 
   const storage = new Storage(client);
   const databases = new Databases(client);
+  const functions = new Functions(client);
+  const users = new Users(client);
 
   const userId = req.headers['x-appwrite-user-id'] ?? null;
   const fileId = req.bodyRaw ?? null;
 
-  if (!userId) {
-    return res.send('Only users can add books.', 400);
-  }
+  const userExists = false;
+  try {
+    if (userId) {
+      await users.get(userId);
+      userExists = true;
+    }
+  } catch (err) { };
+
+  const scopedPermissions = userExists ? [Permission.read(Role.user(userId))] : [Permission.read(Role.users())];
 
   if (!fileId) {
     return res.send('Please provide book file ID.', 400);
@@ -121,13 +126,14 @@ export default async ({ req, res, log, error }) => {
       'books',
       fileId,
       {
+        isPublic: userExists === true ? false : true,
         title,
         author,
         publisher,
         ready: false,
         pages: 0,
       },
-      [Permission.read(Role.user(userId))]
+      scopedPermissions
     );
   }
 
@@ -192,76 +198,40 @@ export default async ({ req, res, log, error }) => {
     log(`Working on ${page}/${fileUrls.length}`);
 
     let hasDocument = false;
+    let hasDocumentContent = false;
     try {
-      await databases.getDocument('main', 'pages', `${fileId}-${page}`);
+      const pageDetails = await databases.getDocument('main', 'pages', `${fileId}-${page}`);
       hasDocument = true;
+      if (pageDetails.ready === true) {
+        hasDocumentContent = true;
+      }
     } catch (err) {}
-
-    let hasFile = false;
-    try {
-      await storage.getFile('pages', `${fileId}-${page}`);
-      hasFile = true;
-    } catch (err) {}
-
-    let pageBuffer = null;
-    if (!hasDocument || !hasFile) {
-      const fileResponse = await axios.default.get(fileUrl, {
-        responseType: 'arraybuffer',
-      });
-      pageBuffer = Buffer.from(fileResponse.data, 'utf-8');
-    }
 
     if (!hasDocument) {
-      log(`Detecting text of page ${page}/${fileUrls.length}`);
-
-      let [result] = await googleClient.textDetection(pageBuffer);
-
-      if (
-        !result ||
-        !result.fullTextAnnotation ||
-        !result.fullTextAnnotation.text
-      ) {
-        result = result ?? {};
-        result.fullTextAnnotation = result.fullTextAnnotation ?? {};
-        result.fullTextAnnotation.text = 'Empty page.';
-      }
-
-      let pageText = result.fullTextAnnotation.text;
-      pageText = pageText.split('„').join('"');
-      pageText = pageText.split('“').join('"');
-      pageText = pageText.split(',,').join('"');
-      pageText = pageText.split("''").join('"');
-      pageText = pageText.split("❝'").join('"');
-      pageText = pageText.split("❝'").join('"');
-      pageText = pageText.split("❞'").join('"');
-      pageText = pageText.split("–'").join('-');
-      pageText = pageText.split("…'").join('...');
-
-      log(`Saving page text ${page}/${fileUrls.length}`);
+      log(`Creating page doc ${page}/${fileUrls.length}`);
 
       await databases.createDocument(
         'main',
         'pages',
         `${fileId}-${page}`,
         {
+          ready: false,
+          jobFileUrl: fileUrl,
           bookId: fileId,
           page: page,
-          text: pageText,
-          words: pageText.split('\n').join(' ').split(' ').length,
+          text: 'Processing...',
+          words: 1,
         },
-        [Permission.read(Role.user(userId))]
+        scopedPermissions
       );
     }
 
-    if (!hasFile) {
-      log(`Uploading output file ${page}/${fileUrls.length}`);
-
-      await storage.createFile(
-        'pages',
-        `${fileId}-${page}`,
-        InputFile.fromBuffer(pageBuffer, `${fileId}-${page}.png`),
-        [Permission.read(Role.user(userId))]
-      );
+    if (!hasDocumentContent) {
+      log('Adding job as it is not ready yet');
+      await functions.createExecution('processPage', JSON.stringify({
+        pageId: `${fileId}-${page}`,
+        scopedPermissions
+      }), true);
     }
 
     page++;
@@ -271,7 +241,7 @@ export default async ({ req, res, log, error }) => {
 
   await databases.updateDocument('main', 'books', fileId, {
     ready: true,
-    pages: page,
+    pages: page - 1,
   });
 
   return res.send('OK');
