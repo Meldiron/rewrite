@@ -1,5 +1,33 @@
-Badges:
+Now:
 
+TODO: Pagination on pages of book
+TODO: Search books
+TODO: Unlocks: Level 3: Custom books
+TODO: Streaks: Highest streak
+
+With progress:
+TODO: Badges (with level unlock), monthly too?
+TODO: Quests (with level unlock)
+TODO: Quest points store
+TODO: Completed books checkmark
+
+Later:
+TODO: Top100 books
+TODO: Update favicon and SEO stuff
+TODO: Community goals
+
+```markdown
+Levels left: 20, 75?
+
+Quests:
+  [100,500,1000] words [without mistake]
+  [10,50,100] {5-10}+ character words [without mistake]
+  [3,5,10] pages
+
+Shop:
+  Restore highest streak
+
+Badges:
 - Books/pages/Words
 - words without mistake
 - words of length X
@@ -7,30 +35,6 @@ Badges:
 - use X skips
 - X words with case sentivity
 - X words with accent senstivity
--
-
-TODO: Change book details (tiitle, author, publisher)
-TODO: Retry book addition? 15 min ain't enough. When in waiiting state, show ETA date when finished
-
----
-
-TODO: Pagination on pages of book
-TODO: Top100 books
-TODO: Search books
-
-TODO: Update favicon and SEO stuff
-TODO: Completed books checkmark
-TODO: Quests (with level unlock)
-TODO: Quest points store
-TODO: Badges (with level unlock), monthly too?
-TODO: Community goals
-
-```markdown
-- coins
-- currentQuest
-  [100,500,1000] words [without mistake]
-  [10,50,100] {5-10}+ character words [without mistake]
-  [3,5,10] pages
 ```
 
 # create-svelte
