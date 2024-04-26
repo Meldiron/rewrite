@@ -1,4 +1,5 @@
 Badges:
+
 - Books/pages/Words
 - words without mistake
 - words of length X
@@ -6,13 +7,16 @@ Badges:
 - use X skips
 - X words with case sentivity
 - X words with accent senstivity
-- 
-
+-
 
 TODO: Change book details (tiitle, author, publisher)
 TODO: Retry book addition? 15 min ain't enough. When in waiiting state, show ETA date when finished
 
 ---
+
+TODO: Pagination on pages of book
+TODO: Top100 books
+TODO: Search books
 
 TODO: Update favicon and SEO stuff
 TODO: Completed books checkmark

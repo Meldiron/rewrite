@@ -21,6 +21,7 @@ export const load: LayoutLoad = async () => {
 			profile = await databases.getDocument('main', 'profiles', user.prefs.profileId);
 		} else {
 			profile = await databases.createDocument('main', 'profiles', ID.unique(), {
+				pinnedBooks: [],
 				streak: 0,
 				lastStreakDate: null,
 				xp: 0,

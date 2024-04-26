@@ -1,20 +1,87 @@
 <script lang="ts">
-	import { storage } from '$lib/appwrite';
+	import { invalidateAll } from '$app/navigation';
+	import { databases, storage } from '$lib/appwrite';
+	import { profileMenuStore, toastStore } from '$lib/stores';
+	import { Query } from 'appwrite';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
+
+	let hasMore = data.books.documents.length < data.books.total;
 
 	function getFinishes(bookId: string) {
 		const finishes = data.finishes.documents.find((f) => f.bookId === bookId);
 		console.log(finishes ? finishes.pageNumbers.length : 0);
 		return finishes ? finishes.pageNumbers.length : 0;
 	}
+
+	let submitting = false;
+	async function pinBook(bookId: string) {
+		if (submitting) return;
+
+		submitting = true;
+
+		try {
+			if (data.profile.pinnedBooks.includes(bookId)) {
+				data.profile.pinnedBooks = data.profile.pinnedBooks.filter((id: any) => id !== bookId);
+			} else {
+				data.profile.pinnedBooks.push(bookId);
+			}
+
+			await databases.updateDocument('main', 'profiles', data.profile.$id, {
+				pinnedBooks: data.profile.pinnedBooks
+			});
+			await invalidateAll();
+			$toastStore = null;
+		} catch (err: any) {
+			$toastStore = err.message || err || 'An error occurred';
+		} finally {
+			submitting = false;
+		}
+	}
+
+	let submittingLoadMore = false;
+	async function loadMore() {
+		if (submittingLoadMore) return;
+
+		submittingLoadMore = true;
+
+		try {
+			const lastDocId = data.books.documents[data.books.documents.length - 1].$id;
+			const nextPage = await databases.listDocuments('main', 'books', [
+				Query.cursorAfter(lastDocId),
+				Query.limit(data.perPage),
+				Query.equal('isPublic', data.isPublic)
+			]);
+
+			data.books.documents = [...data.books.documents, ...nextPage.documents];
+			data.books.total = nextPage.total;
+			hasMore = data.books.documents.length < data.books.total;
+
+			if (nextPage.documents.length <= 0) {
+				hasMore = false;
+			}
+
+			$toastStore = null;
+		} catch (err: any) {
+			$toastStore = err.message || err || 'An error occurred';
+		} finally {
+			submittingLoadMore = false;
+		}
+	}
 </script>
 
 <div class="max-w-2xl mx-auto">
-	<h1 class="text-4xl font-semibold my-8">
-		<span>Books</span><span class=" animate-cursor text-primary">_</span>
-	</h1>
+	<div class="flex flex-col sm:flex-row gap-4 justify-between w-full items-center">
+		<h1 class="text-4xl font-semibold my-8">
+			<span>{data.isPublic ? 'Public Library' : 'My Library'}</span><span
+				class=" animate-cursor text-primary">_</span
+			>
+		</h1>
+		{#if !data.isPublic}
+			<a href="/app/books-new" class="btn btn-outline">Add EPUB book</a>
+		{/if}
+	</div>
 
 	<div class="flex flex-col gap-6">
 		{#if data.books.documents.length <= 0}
@@ -31,7 +98,7 @@
 						d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
 					></path></svg
 				>
-				<span>No books found. Let's add some!</span>
+				<span>No books found.</span>
 			</div>
 		{/if}
 		{#each data.books.documents as book}
@@ -55,7 +122,9 @@
 					>
 				</div>
 			{:else}
-				<div class="card lg:card-side bg-base-100 shadow-xl">
+				<div
+					class={`card lg:card-side bg-base-100 shadow-xl ${data.profile.pinnedBooks.includes(book.$id) ? 'border border-base-content' : ''}`}
+				>
 					<figure>
 						<a href={`/app/books/${book.$id}`}>
 							<div class="w-full aspect-[3/4] !w-[250px]">
@@ -96,13 +165,51 @@
 							<p class="mt-2 text-sm opacity-50">{book.publisher}</p>
 						</div>
 						<div class="card-actions justify-end">
+							<button
+								on:click={() => pinBook(book.$id)}
+								disabled={submitting}
+								class="btn btn-primary btn-ghost"
+							>
+								{#if data.profile.pinnedBooks.includes(book.$id)}
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 24 24"
+										fill="currentColor"
+										class="w-6 h-6"
+									>
+										<path
+											fill-rule="evenodd"
+											d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
+											clip-rule="evenodd"
+										/>
+									</svg>
+								{:else}
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke-width="1.5"
+										stroke="currentColor"
+										class="w-6 h-6"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"
+										/>
+									</svg>
+								{/if}
+							</button>
 							<a href={`/app/books/${book.$id}`} class="btn btn-primary">Rewrite book</a>
 						</div>
 					</div>
 				</div>
 			{/if}
 		{/each}
-
-		<a href="/app/books-new" class="btn btn-outline btn-block">Add EPUB book</a>
+		{#if hasMore}
+			<button disabled={submittingLoadMore} on:click={loadMore} class="btn btn-outline"
+				>Load more</button
+			>
+		{/if}
 	</div>
 </div>

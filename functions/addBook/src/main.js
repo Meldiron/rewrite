@@ -78,9 +78,11 @@ export default async ({ req, res, log, error }) => {
       await users.get(userId);
       userExists = true;
     }
-  } catch (err) { };
+  } catch (err) {}
 
-  const scopedPermissions = userExists ? [Permission.read(Role.user(userId))] : [Permission.read(Role.users())];
+  const scopedPermissions = userExists
+    ? [Permission.read(Role.user(userId))]
+    : [Permission.read(Role.users())];
 
   if (!fileId) {
     return res.send('Please provide book file ID.', 400);
@@ -200,7 +202,11 @@ export default async ({ req, res, log, error }) => {
     let hasDocument = false;
     let hasDocumentContent = false;
     try {
-      const pageDetails = await databases.getDocument('main', 'pages', `${fileId}-${page}`);
+      const pageDetails = await databases.getDocument(
+        'main',
+        'pages',
+        `${fileId}-${page}`
+      );
       hasDocument = true;
       if (pageDetails.ready === true) {
         hasDocumentContent = true;
@@ -228,10 +234,14 @@ export default async ({ req, res, log, error }) => {
 
     if (!hasDocumentContent) {
       log('Adding job as it is not ready yet');
-      await functions.createExecution('processPage', JSON.stringify({
-        pageId: `${fileId}-${page}`,
-        scopedPermissions
-      }), true);
+      await functions.createExecution(
+        'processPage',
+        JSON.stringify({
+          pageId: `${fileId}-${page}`,
+          scopedPermissions,
+        }),
+        true
+      );
     }
 
     page++;

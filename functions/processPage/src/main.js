@@ -37,7 +37,7 @@ export default async ({ req, res, log, error }) => {
   try {
     await storage.getFile('pages', `${fileId}-${page}`);
     hasFile = true;
-  } catch (err) { }
+  } catch (err) {}
 
   if (!hasFile) {
     log(`Downloading file`);
@@ -88,16 +88,11 @@ export default async ({ req, res, log, error }) => {
 
   log(`Saving page text`);
 
-  await databases.updateDocument(
-    'main',
-    'pages',
-    pageId,
-    {
-      ready: true,
-      text: pageText,
-      words: pageText.split('\n').join(' ').split(' ').length,
-    }
-  );
+  await databases.updateDocument('main', 'pages', pageId, {
+    ready: true,
+    text: pageText,
+    words: pageText.split('\n').join(' ').split(' ').length,
+  });
 
   log('Done');
 

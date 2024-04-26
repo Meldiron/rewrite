@@ -22,8 +22,11 @@
 						<button class="btn btn-active btn-outline btn-wide">Sign Up</button>
 					</a>
 				{:else}
-					<a href="/auth/sign-in">
-						<button class="btn btn-active btn-outline btn-wide">My library</button>
+					<a href="/app/books?type=public">
+						<button class="btn btn-active btn-outline btn-wide">Public library</button>
+					</a>
+					<a href="/app/books?type=private">
+						<button class="btn btn-active btn-wide">My library</button>
 					</a>
 				{/if}
 			</div>
