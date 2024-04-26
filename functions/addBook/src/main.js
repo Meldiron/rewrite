@@ -10,6 +10,7 @@ import {
 import fs from 'fs/promises';
 import * as axios from 'axios';
 import { parseEpub } from '@gxl/epub-parser';
+import { latinize } from './latinize.js';
 
 async function getJobFromUuid(log, uuid, index = 0) {
   try {
@@ -123,6 +124,9 @@ export default async ({ req, res, log, error }) => {
 
     log('Storing data about book');
 
+    let search = `${title.toLowerCase()} ${author.toLowerCase()} ${publisher.toLowerCase()}`;
+    search += ' ' + latinize('search');
+
     existingDoc = await databases.createDocument(
       'main',
       'books',
@@ -134,6 +138,7 @@ export default async ({ req, res, log, error }) => {
         publisher,
         ready: false,
         pages: 0,
+        search,
       },
       scopedPermissions
     );

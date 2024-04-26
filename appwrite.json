@@ -164,9 +164,28 @@
 					"required": true,
 					"array": false,
 					"default": null
+				},
+				{
+					"key": "search",
+					"type": "string",
+					"status": "available",
+					"error": "",
+					"required": true,
+					"array": false,
+					"size": 100000,
+					"default": null
 				}
 			],
-			"indexes": []
+			"indexes": [
+				{
+					"key": "index_1",
+					"type": "fulltext",
+					"status": "available",
+					"error": "",
+					"attributes": ["search"],
+					"orders": ["ASC"]
+				}
+			]
 		},
 		{
 			"$id": "pages",
@@ -378,6 +397,16 @@
 				},
 				{
 					"key": "badges",
+					"type": "string",
+					"status": "available",
+					"error": "",
+					"required": false,
+					"array": true,
+					"size": 255,
+					"default": null
+				},
+				{
+					"key": "pinnedBooks",
 					"type": "string",
 					"status": "available",
 					"error": "",

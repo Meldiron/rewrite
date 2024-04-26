@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { databases, storage } from '$lib/appwrite';
 	import { profileMenuStore, toastStore } from '$lib/stores';
 	import { Query } from 'appwrite';
 	import type { PageData } from './$types';
+	import debounce from 'lodash/debounce';
 
 	export let data: PageData;
 
@@ -69,10 +70,14 @@
 			submittingLoadMore = false;
 		}
 	}
+
+	const handleSearch = debounce((e: any) => {
+		goto(`/app/books/?type=${data.isPublic ? 'public' : 'private'}&search=${e.target.value}`);
+	}, 300);
 </script>
 
 <div class="max-w-2xl mx-auto">
-	<div class="flex flex-col sm:flex-row gap-4 justify-between w-full items-center">
+	<div class="flex flex-col sm:flex-row gap-1 justify-between w-full items-center">
 		<h1 class="text-4xl font-semibold my-8">
 			<span>{data.isPublic ? 'Public Library' : 'My Library'}</span><span
 				class=" animate-cursor text-primary">_</span
@@ -82,6 +87,29 @@
 			<a href="/app/books-new" class="btn btn-outline">Add EPUB book</a>
 		{/if}
 	</div>
+
+	{#if data.books.documents.length > 0 || data.search}
+		<label class="input input-bordered flex items-center gap-2 mb-4 mt-4">
+			<input
+				value={data.search}
+				on:input={handleSearch}
+				type="text"
+				class="grow"
+				placeholder="Search"
+			/>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 16 16"
+				fill="currentColor"
+				class="w-4 h-4 opacity-70"
+				><path
+					fill-rule="evenodd"
+					d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+					clip-rule="evenodd"
+				/></svg
+			>
+		</label>
+	{/if}
 
 	<div class="flex flex-col gap-6">
 		{#if data.books.documents.length <= 0}

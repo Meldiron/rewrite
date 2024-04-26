@@ -1,7 +1,6 @@
 Now:
 
 TODO: Pagination on pages of book
-TODO: Search books
 TODO: Unlocks: Level 3: Custom books
 TODO: Streaks: Highest streak
 
@@ -20,14 +19,15 @@ TODO: Community goals
 Levels left: 20, 75?
 
 Quests:
-  [100,500,1000] words [without mistake]
-  [10,50,100] {5-10}+ character words [without mistake]
-  [3,5,10] pages
+[100,500,1000] words [without mistake]
+[10,50,100] {5-10}+ character words [without mistake]
+[3,5,10] pages
 
 Shop:
-  Restore highest streak
+Restore highest streak
 
 Badges:
+
 - Books/pages/Words
 - words without mistake
 - words of length X

@@ -5,13 +5,15 @@ import type { PageLoad } from './$types';
 export const load: PageLoad = async ({ parent, url }) => {
 	const perPage = 10;
 	const isPublic = (url.searchParams.get('type') ?? 'public') === 'public';
+	const search = url.searchParams.get('search') ?? '';
 
+	const booksQuery = [Query.limit(perPage), Query.equal('isPublic', isPublic)];
+	if (search) {
+		booksQuery.push(Query.search('search', search.toLowerCase()));
+	}
 	const [data, books] = await Promise.all([
 		parent(),
-		databases.listDocuments('main', 'books', [
-			Query.limit(perPage),
-			Query.equal('isPublic', isPublic)
-		])
+		databases.listDocuments('main', 'books', booksQuery)
 	]);
 
 	let finishesQuery = [Query.limit(1), Query.equal('$id', 'empty-response')];
@@ -38,6 +40,7 @@ export const load: PageLoad = async ({ parent, url }) => {
 		},
 		finishes,
 		isPublic,
-		perPage
+		perPage,
+		search
 	};
 };
