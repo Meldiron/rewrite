@@ -13,6 +13,35 @@ export function hasStreak(streakDate: string | null) {
 	);
 }
 
+export function hasStreakOnDate(profileStreakDate: string | null, daysDiff: number) {
+	const date = new Date();
+	if (!profileStreakDate) {
+		return false;
+	}
+
+	if (daysDiff === 0) {
+		return hasStreak(profileStreakDate);
+	}
+
+	if (daysDiff > 0) {
+		return false;
+	}
+
+	daysDiff *= -1;
+
+	const streakStartDate = new Date(profileStreakDate ?? '');
+	console.log(streakStartDate);
+	const daysOfStreak = Math.ceil(
+		(date.getTime() - streakStartDate.getTime()) / (1000 * 60 * 60 * 24)
+	);
+	console.log(daysOfStreak);
+	if (daysOfStreak >= daysDiff) {
+		return true;
+	}
+
+	return false;
+}
+
 export function isStreakEnded(streakDate: string | null) {
 	if (!streakDate) {
 		return false;

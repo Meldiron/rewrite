@@ -8,7 +8,14 @@
 		streakModalStore,
 		toastStore
 	} from '$lib/stores';
-	import { getExtraXp, getLevel, getLevelProgress, getXpRemaining, hasStreak } from '$lib/utils';
+	import {
+		getExtraXp,
+		getLevel,
+		getLevelProgress,
+		getXpRemaining,
+		hasStreak,
+		hasStreakOnDate
+	} from '$lib/utils';
 	import '../app.css';
 	import type { PageData } from './$types';
 
@@ -44,6 +51,17 @@
 		}
 
 		return 'alert-base-100 bg-base-100 border-base-100 text-primary';
+	}
+
+	function getRelativeDate(diffInDays: number) {
+		const dateNow = Date.now();
+		const date = new Date(dateNow + diffInDays * 24 * 60 * 60 * 1000);
+		return date;
+	}
+
+	function dateToDayName(date: Date) {
+		const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+		return days[date.getDay()];
 	}
 
 	async function setAccentSensitivity(e: any) {
@@ -425,145 +443,207 @@
 							>Sign out</button
 						>
 					{:else if $profileMenuStore.tab === 'stats'}
-						<div class="stat">
-							<div class="stat-figure text-neutral-content">
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									viewBox="0 0 24 24"
-									fill="currentColor"
-									class="w-8 h-8"
-								>
-									<path
-										fill-rule="evenodd"
-										d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
-										clip-rule="evenodd"
-									/>
-								</svg>
-							</div>
-							<div class="stat-value">{data.profile.booksFinished}</div>
-							<div class="text-active">Books rewritten</div>
-						</div>
-
-						<div class="stat">
-							<div class="stat-figure text-neutral-content">
+						{#if getLevel(data.profile.xp) < 3}
+							<div
+								role="alert"
+								class="alert alert-warning"
+								style="grid-auto-flow: row; justify-items: center; text-align: center; grid-template-columns: unset;"
+							>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
 									fill="none"
 									viewBox="0 0 24 24"
 									stroke-width="1.5"
 									stroke="currentColor"
-									class="w-8 h-8"
+									class="stroke-current shrink-0 w-6 h-6"
 								>
 									<path
 										stroke-linecap="round"
 										stroke-linejoin="round"
-										d="M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a.64.64 0 0 1-.657.643 48.39 48.39 0 0 1-4.163-.3c.186 1.613.293 3.25.315 4.907a.656.656 0 0 1-.658.663v0c-.355 0-.676-.186-.959-.401a1.647 1.647 0 0 0-1.003-.349c-1.036 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401v0c.31 0 .555.26.532.57a48.039 48.039 0 0 1-.642 5.056c1.518.19 3.058.309 4.616.354a.64.64 0 0 0 .657-.643v0c0-.355-.186-.676-.401-.959a1.647 1.647 0 0 1-.349-1.003c0-1.035 1.008-1.875 2.25-1.875 1.243 0 2.25.84 2.25 1.875 0 .369-.128.713-.349 1.003-.215.283-.4.604-.4.959v0c0 .333.277.599.61.58a48.1 48.1 0 0 0 5.427-.63 48.05 48.05 0 0 0 .582-4.717.532.532 0 0 0-.533-.57v0c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.035 0-1.875-1.007-1.875-2.25s.84-2.25 1.875-2.25c.37 0 .713.128 1.003.349.283.215.604.401.96.401v0a.656.656 0 0 0 .658-.663 48.422 48.422 0 0 0-.37-5.36c-1.886.342-3.81.574-5.766.689a.578.578 0 0 1-.61-.58v0Z"
+										d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
 									/>
 								</svg>
-							</div>
-							<div class="stat-title text-primary">Rewritten words</div>
-							<div class="stat-value text-active">{data.profile.wordsFinished}</div>
-						</div>
 
-						<div class="stat">
-							<div class="stat-figure text-neutral-content">
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke-width="1.5"
-									stroke="currentColor"
-									class="w-8 h-8"
+								<span>You need level 3 to view stats</span>
+
+								<a
+									on:click={() => ($profileMenuStore.opened = false)}
+									href="/app/unlocks"
+									class="btn btn-sm btn-warning shadow-none">View unlocks</a
 								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-									/>
-								</svg>
 							</div>
-							<div class="stat-title text-primary">Rewritten pages</div>
-							<div class="stat-value text-active">{data.profile.pagesFinished}</div>
-						</div>
+						{:else}
+							<div class="stat">
+								<div class="stat-figure text-neutral-content">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 24 24"
+										fill="currentColor"
+										class="w-8 h-8"
+									>
+										<path
+											fill-rule="evenodd"
+											d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
+											clip-rule="evenodd"
+										/>
+									</svg>
+								</div>
+								<div class="stat-value">{data.profile.booksFinished}</div>
+								<div class="text-active">Books rewritten</div>
+							</div>
+
+							<div class="stat">
+								<div class="stat-figure text-neutral-content">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke-width="1.5"
+										stroke="currentColor"
+										class="w-8 h-8"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											d="M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a.64.64 0 0 1-.657.643 48.39 48.39 0 0 1-4.163-.3c.186 1.613.293 3.25.315 4.907a.656.656 0 0 1-.658.663v0c-.355 0-.676-.186-.959-.401a1.647 1.647 0 0 0-1.003-.349c-1.036 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401v0c.31 0 .555.26.532.57a48.039 48.039 0 0 1-.642 5.056c1.518.19 3.058.309 4.616.354a.64.64 0 0 0 .657-.643v0c0-.355-.186-.676-.401-.959a1.647 1.647 0 0 1-.349-1.003c0-1.035 1.008-1.875 2.25-1.875 1.243 0 2.25.84 2.25 1.875 0 .369-.128.713-.349 1.003-.215.283-.4.604-.4.959v0c0 .333.277.599.61.58a48.1 48.1 0 0 0 5.427-.63 48.05 48.05 0 0 0 .582-4.717.532.532 0 0 0-.533-.57v0c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.035 0-1.875-1.007-1.875-2.25s.84-2.25 1.875-2.25c.37 0 .713.128 1.003.349.283.215.604.401.96.401v0a.656.656 0 0 0 .658-.663 48.422 48.422 0 0 0-.37-5.36c-1.886.342-3.81.574-5.766.689a.578.578 0 0 1-.61-.58v0Z"
+										/>
+									</svg>
+								</div>
+								<div class="stat-title text-primary">Rewritten words</div>
+								<div class="stat-value text-active">{data.profile.wordsFinished}</div>
+							</div>
+
+							<div class="stat">
+								<div class="stat-figure text-neutral-content">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke-width="1.5"
+										stroke="currentColor"
+										class="w-8 h-8"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+										/>
+									</svg>
+								</div>
+								<div class="stat-title text-primary">Rewritten pages</div>
+								<div class="stat-value text-active">{data.profile.pagesFinished}</div>
+							</div>
+						{/if}
 
 						<div class="divider">Badges</div>
 
-						<div class="flex items-center w-full gap-4">
-							<div class="avatar placeholder border-none">
-								<div
-									class="w-16 mask mask-hexagon bg-base-300 bg-opacity-50 text-white text-opacity-50"
+						{#if getLevel(data.profile.xp) < 20}
+							<div
+								role="alert"
+								class="alert alert-warning"
+								style="grid-auto-flow: row; justify-items: center; text-align: center; grid-template-columns: unset;"
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke-width="1.5"
+									stroke="currentColor"
+									class="stroke-current shrink-0 w-6 h-6"
 								>
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										viewBox="0 0 24 24"
-										fill="currentColor"
-										class="w-6 h-6"
-									>
-										<path
-											fill-rule="evenodd"
-											d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 0 0-.584.859 6.753 6.753 0 0 0 6.138 5.6 6.73 6.73 0 0 0 2.743 1.346A6.707 6.707 0 0 1 9.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 0 0-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 0 1-1.112-3.173 6.73 6.73 0 0 0 2.743-1.347 6.753 6.753 0 0 0 6.139-5.6.75.75 0 0 0-.585-.858 47.077 47.077 0 0 0-3.07-.543V2.62a.75.75 0 0 0-.658-.744 49.22 49.22 0 0 0-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 0 0-.657.744Zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 0 1 3.16 5.337a45.6 45.6 0 0 1 2.006-.343v.256Zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 0 1-2.863 3.207 6.72 6.72 0 0 0 .857-3.294Z"
-											clip-rule="evenodd"
-										/>
-									</svg>
-								</div>
-							</div>
-							<div class="w-full">
-								<p class="text-primary text-sm">Bla bla bla bla</p>
-								<progress class="progress w-56" value="40" max="100"></progress>
-								<p class="text-xs">10 / 55</p>
-							</div>
-						</div>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
+									/>
+								</svg>
 
-						<div>
-							<div class="avatar placeholder border-none">
-								<div class="w-16 mask mask-hexagon bg-[#CD7F32] text-base-100">
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										viewBox="0 0 24 24"
-										fill="currentColor"
-										class="w-6 h-6"
+								<span>You need level 20 to view badges</span>
+
+								<a
+									on:click={() => ($profileMenuStore.opened = false)}
+									href="/app/unlocks"
+									class="btn btn-sm btn-warning shadow-none">View unlocks</a
+								>
+							</div>
+						{:else}
+							<div class="flex items-center w-full gap-4">
+								<div class="avatar placeholder border-none">
+									<div
+										class="w-16 mask mask-hexagon bg-base-300 bg-opacity-50 text-white text-opacity-50"
 									>
-										<path
-											fill-rule="evenodd"
-											d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 0 0-.584.859 6.753 6.753 0 0 0 6.138 5.6 6.73 6.73 0 0 0 2.743 1.346A6.707 6.707 0 0 1 9.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 0 0-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 0 1-1.112-3.173 6.73 6.73 0 0 0 2.743-1.347 6.753 6.753 0 0 0 6.139-5.6.75.75 0 0 0-.585-.858 47.077 47.077 0 0 0-3.07-.543V2.62a.75.75 0 0 0-.658-.744 49.22 49.22 0 0 0-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 0 0-.657.744Zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 0 1 3.16 5.337a45.6 45.6 0 0 1 2.006-.343v.256Zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 0 1-2.863 3.207 6.72 6.72 0 0 0 .857-3.294Z"
-											clip-rule="evenodd"
-										/>
-									</svg>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+											class="w-6 h-6"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 0 0-.584.859 6.753 6.753 0 0 0 6.138 5.6 6.73 6.73 0 0 0 2.743 1.346A6.707 6.707 0 0 1 9.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 0 0-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 0 1-1.112-3.173 6.73 6.73 0 0 0 2.743-1.347 6.753 6.753 0 0 0 6.139-5.6.75.75 0 0 0-.585-.858 47.077 47.077 0 0 0-3.07-.543V2.62a.75.75 0 0 0-.658-.744 49.22 49.22 0 0 0-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 0 0-.657.744Zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 0 1 3.16 5.337a45.6 45.6 0 0 1 2.006-.343v.256Zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 0 1-2.863 3.207 6.72 6.72 0 0 0 .857-3.294Z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</div>
+								</div>
+								<div class="w-full">
+									<p class="text-primary text-sm">Bla bla bla bla</p>
+									<progress class="progress w-56" value="40" max="100"></progress>
+									<p class="text-xs">10 / 55</p>
 								</div>
 							</div>
-							<div class="avatar placeholder border-none">
-								<div class="w-16 mask mask-hexagon bg-primary text-primary-content">
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										viewBox="0 0 24 24"
-										fill="currentColor"
-										class="w-6 h-6"
-									>
-										<path
-											fill-rule="evenodd"
-											d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 0 0-.584.859 6.753 6.753 0 0 0 6.138 5.6 6.73 6.73 0 0 0 2.743 1.346A6.707 6.707 0 0 1 9.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 0 0-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 0 1-1.112-3.173 6.73 6.73 0 0 0 2.743-1.347 6.753 6.753 0 0 0 6.139-5.6.75.75 0 0 0-.585-.858 47.077 47.077 0 0 0-3.07-.543V2.62a.75.75 0 0 0-.658-.744 49.22 49.22 0 0 0-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 0 0-.657.744Zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 0 1 3.16 5.337a45.6 45.6 0 0 1 2.006-.343v.256Zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 0 1-2.863 3.207 6.72 6.72 0 0 0 .857-3.294Z"
-											clip-rule="evenodd"
-										/>
-									</svg>
+
+							<div>
+								<div class="avatar placeholder border-none">
+									<div class="w-16 mask mask-hexagon bg-[#CD7F32] text-base-100">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+											class="w-6 h-6"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 0 0-.584.859 6.753 6.753 0 0 0 6.138 5.6 6.73 6.73 0 0 0 2.743 1.346A6.707 6.707 0 0 1 9.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 0 0-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 0 1-1.112-3.173 6.73 6.73 0 0 0 2.743-1.347 6.753 6.753 0 0 0 6.139-5.6.75.75 0 0 0-.585-.858 47.077 47.077 0 0 0-3.07-.543V2.62a.75.75 0 0 0-.658-.744 49.22 49.22 0 0 0-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 0 0-.657.744Zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 0 1 3.16 5.337a45.6 45.6 0 0 1 2.006-.343v.256Zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 0 1-2.863 3.207 6.72 6.72 0 0 0 .857-3.294Z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</div>
+								</div>
+								<div class="avatar placeholder border-none">
+									<div class="w-16 mask mask-hexagon bg-primary text-primary-content">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+											class="w-6 h-6"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 0 0-.584.859 6.753 6.753 0 0 0 6.138 5.6 6.73 6.73 0 0 0 2.743 1.346A6.707 6.707 0 0 1 9.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 0 0-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 0 1-1.112-3.173 6.73 6.73 0 0 0 2.743-1.347 6.753 6.753 0 0 0 6.139-5.6.75.75 0 0 0-.585-.858 47.077 47.077 0 0 0-3.07-.543V2.62a.75.75 0 0 0-.658-.744 49.22 49.22 0 0 0-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 0 0-.657.744Zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 0 1 3.16 5.337a45.6 45.6 0 0 1 2.006-.343v.256Zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 0 1-2.863 3.207 6.72 6.72 0 0 0 .857-3.294Z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</div>
+								</div>
+								<div class="avatar placeholder border-none">
+									<div class="w-16 mask mask-hexagon bg-warning text-warning-content gold-badge">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+											class="w-6 h-6"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 0 0-.584.859 6.753 6.753 0 0 0 6.138 5.6 6.73 6.73 0 0 0 2.743 1.346A6.707 6.707 0 0 1 9.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 0 0-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 0 1-1.112-3.173 6.73 6.73 0 0 0 2.743-1.347 6.753 6.753 0 0 0 6.139-5.6.75.75 0 0 0-.585-.858 47.077 47.077 0 0 0-3.07-.543V2.62a.75.75 0 0 0-.658-.744 49.22 49.22 0 0 0-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 0 0-.657.744Zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 0 1 3.16 5.337a45.6 45.6 0 0 1 2.006-.343v.256Zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 0 1-2.863 3.207 6.72 6.72 0 0 0 .857-3.294Z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</div>
 								</div>
 							</div>
-							<div class="avatar placeholder border-none">
-								<div class="w-16 mask mask-hexagon bg-warning text-warning-content gold-badge">
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										viewBox="0 0 24 24"
-										fill="currentColor"
-										class="w-6 h-6"
-									>
-										<path
-											fill-rule="evenodd"
-											d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 0 0-.584.859 6.753 6.753 0 0 0 6.138 5.6 6.73 6.73 0 0 0 2.743 1.346A6.707 6.707 0 0 1 9.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 0 0-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 0 1-1.112-3.173 6.73 6.73 0 0 0 2.743-1.347 6.753 6.753 0 0 0 6.139-5.6.75.75 0 0 0-.585-.858 47.077 47.077 0 0 0-3.07-.543V2.62a.75.75 0 0 0-.658-.744 49.22 49.22 0 0 0-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 0 0-.657.744Zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 0 1 3.16 5.337a45.6 45.6 0 0 1 2.006-.343v.256Zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 0 1-2.863 3.207 6.72 6.72 0 0 0 .857-3.294Z"
-											clip-rule="evenodd"
-										/>
-									</svg>
-								</div>
-							</div>
-						</div>
+						{/if}
 					{:else if $profileMenuStore.tab === 'quests'}
 						<p class="text-center opacity-50">Coming soon...</p>
 					{/if}
@@ -583,9 +663,81 @@
 					Rewrite at least one page every day, and increase your streak by one point each time. High
 					streaks show dedication and give profile badges.
 				</p>
-				<p>
-					Your current streak is: <span class="text-xl font-bold">{data.profile.streak}</span>
-				</p>
+
+				<div class="grid grid-cols-7 gap-4 sm:gap-8">
+					{#each [-3, -2, -1, 0, 1, 2, 3] as day}
+						<div class="col-span-1">
+							<div
+								class={`${day === 0 ? 'opacity-100' : 'opacity-0'} w-full justify-center flex my-2`}
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke-width="1.5"
+									stroke="currentColor"
+									class="w-5 h-5"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										d="m4.5 5.25 7.5 7.5 7.5-7.5m-15 6 7.5 7.5 7.5-7.5"
+									/>
+								</svg>
+							</div>
+
+							{#if hasStreakOnDate(data.profile.lastStreakDate, day)}
+								<div class="avatar placeholder w-full">
+									<div class="border-2 border-base-content bg-base-content rounded-full w-full p-1">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+											class="w-full text-base-100"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M12.963 2.286a.75.75 0 0 0-1.071-.136 9.742 9.742 0 0 0-3.539 6.176 7.547 7.547 0 0 1-1.705-1.715.75.75 0 0 0-1.152-.082A9 9 0 1 0 15.68 4.534a7.46 7.46 0 0 1-2.717-2.248ZM15.75 14.25a3.75 3.75 0 1 1-7.313-1.172c.628.465 1.35.81 2.133 1a5.99 5.99 0 0 1 1.925-3.546 3.75 3.75 0 0 1 3.255 3.718Z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</div>
+								</div>
+							{:else}
+								<div class="avatar placeholder w-full">
+									<div
+										class="border-2 border-dashed border-neutral text-neutral-content rounded-full w-full"
+									></div>
+								</div>
+							{/if}
+
+							<p class="text-md font-bold text-center mt-1">
+								{dateToDayName(getRelativeDate(day))}
+							</p>
+						</div>
+					{/each}
+				</div>
+
+				<div class="stats shadow w-full">
+					<div class="stat pl-0">
+						<div class="stat-title text-center">Current streak</div>
+						<div class="stat-value text-center">{data.profile.streak}</div>
+					</div>
+				</div>
+
+				<div class="divider m-0"></div>
+
+				<div class="stats shadow w-full">
+					<div class="stat pl-0 w-full">
+						<div class="stat-title">Total day</div>
+						<div class="stat-value">{data.profile.totalStreak}</div>
+					</div>
+
+					<div class="stat float-right text-right pr-0 w-full">
+						<div class="stat-title">Longest streak</div>
+						<div class="stat-value">{data.profile.maxStreak}</div>
+					</div>
+				</div>
 
 				{#if !hasStreak(data.profile.lastStreakDate)}
 					<div role="alert" class="alert alert-error mt-4">

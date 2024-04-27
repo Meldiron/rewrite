@@ -1,8 +1,8 @@
 Now:
 
+TODO: Improve post-page modal with stats. Show level progress, streak if relevant, ...
+TODO: blurhash for pages?
 TODO: Pagination on pages of book
-TODO: Unlocks: Level 3: Custom books
-TODO: Streaks: Highest streak
 
 With progress:
 TODO: Badges (with level unlock), monthly too?

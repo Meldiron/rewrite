@@ -10,10 +10,14 @@
 			level: 1,
 			unlocks: [
 				{
-					title: 'Skip word every 15 seconds',
-					description:
-						'Skip one word when rewriring book. Useful for long words, complex symbols, or mistakes in the book text.'
+					title: 'Public library',
+					description: 'Rewrite most popular books.',
+					action: {
+						href: '/app/books?type=public',
+						text: 'Visit'
+					}
 				},
+
 				{
 					title: 'Streaks',
 					description: 'Keep rewriting at least one page every day to maintain your streak.',
@@ -22,6 +26,24 @@
 							$streakModalStore.opened = true;
 						},
 						text: 'View streaks'
+					}
+				},
+				{
+					title: 'Skip word every 15 seconds',
+					description:
+						'Skip one word when rewriring book. Useful for long words, complex symbols, or mistakes in the book text.'
+				}
+			]
+		},
+		{
+			level: 3,
+			unlocks: [
+				{
+					title: 'My library',
+					description: 'Upload your own EPUB books to rewrite.',
+					action: {
+						href: '/app/books?type=private',
+						text: 'Visit'
 					}
 				},
 				{
@@ -236,9 +258,13 @@
 						</div>
 
 						{#if unlock.action}
-							<button on:click={() => unlock.action?.run()} class="btn btn-sm"
-								>{unlock.action.text}</button
-							>
+							{#if unlock.action.href}
+								<a href={unlock.action?.href} class="btn btn-sm">{unlock.action.text}</a>
+							{:else}
+								<button on:click={() => unlock.action?.run()} class="btn btn-sm"
+									>{unlock.action.text}</button
+								>
+							{/if}
 						{/if}
 					</div>
 				{/each}

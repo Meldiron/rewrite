@@ -23,6 +23,8 @@ export const load: LayoutLoad = async () => {
 			profile = await databases.createDocument('main', 'profiles', ID.unique(), {
 				pinnedBooks: [],
 				streak: 0,
+				maxStreak: 0,
+				totalStreak: 0,
 				lastStreakDate: null,
 				xp: 0,
 				wordsFinished: 0,

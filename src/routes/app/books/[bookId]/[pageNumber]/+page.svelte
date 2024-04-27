@@ -104,6 +104,14 @@
 			streak++;
 		}
 
+		let maxStreak = data.profile.maxStreak ?? 0;
+		if (streak > maxStreak) {
+			maxStreak = streak;
+		}
+
+		let totalStreak = data.profile.totalStreak ?? 0;
+		totalStreak++;
+
 		const xpToAdd = data.page.text.split(' ').join('').split('\n').join('').length;
 		const wordsToAdd = data.page.text.split('\n').join(' ').split(' ').length;
 
@@ -131,6 +139,8 @@
 		await databases.updateDocument('main', 'profiles', data.profile.$id, {
 			lastStreakDate,
 			streak,
+			totalStreak,
+			maxStreak,
 			xp,
 			wordsFinished,
 			pagesFinished,
