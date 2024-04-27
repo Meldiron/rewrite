@@ -13,14 +13,15 @@ export function hasStreak(streakDate: string | null) {
 	);
 }
 
-export function hasStreakOnDate(profileStreakDate: string | null, daysDiff: number) {
-	const date = new Date();
-	if (!profileStreakDate) {
+export function hasStreakOnDate(lastStreakDate: string|null, streak: number, daysDiff: number) {
+	if(!lastStreakDate) {
 		return false;
 	}
 
+	const hasToday = hasStreak(lastStreakDate);
+
 	if (daysDiff === 0) {
-		return hasStreak(profileStreakDate);
+		return hasToday;
 	}
 
 	if (daysDiff > 0) {
@@ -29,17 +30,12 @@ export function hasStreakOnDate(profileStreakDate: string | null, daysDiff: numb
 
 	daysDiff *= -1;
 
-	const streakStartDate = new Date(profileStreakDate ?? '');
-	console.log(streakStartDate);
-	const daysOfStreak = Math.ceil(
-		(date.getTime() - streakStartDate.getTime()) / (1000 * 60 * 60 * 24)
-	);
-	console.log(daysOfStreak);
-	if (daysOfStreak >= daysDiff) {
-		return true;
-	}
 
-	return false;
+	const maxAllowedNumber = hasToday ? (streak-1) : streak;
+
+	console.log(maxAllowedNumber);
+
+	return daysDiff <= maxAllowedNumber;
 }
 
 export function isStreakEnded(streakDate: string | null) {

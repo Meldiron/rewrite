@@ -689,7 +689,7 @@
 								</svg>
 							</div>
 
-							{#if hasStreakOnDate(data.profile.lastStreakDate, day)}
+							{#if hasStreakOnDate(data.profile.lastStreakDate, data.profile.streak, day)}
 								<div class="avatar placeholder w-full">
 									<div class="border-2 border-base-content bg-base-content rounded-full w-full p-1">
 										<svg

@@ -106,8 +106,8 @@
 			<h2 class="card-title">Add a book</h2>
 
 			<p class="text-primary">
-				Submit .EPUB or .PDF file and rewrite your book or document. After upload, please wait for up to 15 minutes for
-				book to be ready. Contact us if book isn't ready within 1 hour.
+				Submit .EPUB or .PDF file and rewrite your book or document. After upload, please wait for
+				up to 15 minutes for book to be ready. Contact us if book isn't ready within 1 hour.
 			</p>
 
 			<label class="form-control w-full">
