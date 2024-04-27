@@ -40,7 +40,7 @@
 			unlocks: [
 				{
 					title: 'My library',
-					description: 'Upload your own EPUB books to rewrite.',
+					description: 'Upload your own EPUB/PDF books/docs to rewrite.',
 					action: {
 						href: '/app/books?type=private',
 						text: 'Visit'

@@ -134,7 +134,7 @@
 				>
 			</h1>
 			{#if !data.isPublic}
-				<a href="/app/books-new" class="btn btn-outline">Add EPUB book</a>
+				<a href="/app/books-new" class="btn btn-outline">Add EPUB/PDF</a>
 			{/if}
 		</div>
 
