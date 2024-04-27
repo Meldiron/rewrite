@@ -73,7 +73,7 @@ export default async ({ req, res, log, error }) => {
   const userId = req.headers['x-appwrite-user-id'] ?? null;
   const fileId = req.bodyRaw ?? null;
 
-  const userExists = false;
+  let userExists = false;
   try {
     if (userId) {
       await users.get(userId);
@@ -86,7 +86,27 @@ export default async ({ req, res, log, error }) => {
     : [Permission.read(Role.users())];
 
   if (!fileId) {
+    log('File ID not found');
     return res.send('Please provide book file ID.', 400);
+  }
+
+  if (userExists) {
+    log('Spending tokens');
+
+    try {
+      const tokens = await databases.getDocument('main', 'tokens', userId);
+      if (tokens.balance === 0) {
+        log('Not enough tokens');
+        return res.send("You don't have any tokens.", 400);
+      }
+
+      await databases.updateDocument('main', 'tokens', userId, {
+        balance: tokens.balance - 1,
+      });
+    } catch (err) {
+      log('Could not spend tokens');
+      return res.send('Could not spend tokens.', 400);
+    }
   }
 
   log('Dowloading source file: ' + fileId);

@@ -306,7 +306,7 @@
 </script>
 
 <div class="max-w-2xl mx-auto">
-	<div class="divider"><a href="/app/books" class="hover:underline">Books</a></div>
+	<div class="divider"><a href="/app/books?type=public" class="hover:underline">Books</a></div>
 	<h1 class="text-4xl font-semibold text-primary text-center my-8">
 		<a href={`/app/books/${data.book.$id}`} class="hover:underline">{data.book.title}</a>
 	</h1>

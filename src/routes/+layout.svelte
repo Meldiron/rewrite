@@ -46,6 +46,9 @@
 		if (type === 'success') {
 			return 'alert-success bg-success-content border-success-content text-success';
 		}
+		if (type === 'error') {
+			return 'alert-error bg-error-content border-error-content text-error';
+		}
 		if (type === 'info') {
 			return 'alert-info bg-info-content border-info-content text-info';
 		}
