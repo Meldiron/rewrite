@@ -72,6 +72,25 @@
 		}
 	}
 
+	function getNextPage(bookId: string) {
+		let nextPage = 1;
+
+		const finishes = data.finishes.documents.find((f) => f.bookId === bookId);
+
+		if (finishes && finishes.pageNumbers.length > 0) {
+			nextPage = finishes.pageNumbers[0];
+			finishes.pageNumbers.forEach((p: any) => {
+				if (p > (nextPage ?? 0)) {
+					nextPage = p;
+				}
+			});
+
+			nextPage = (nextPage ?? 0) + 1;
+		}
+
+		return nextPage;
+	}
+
 	const handleSearch = debounce((e: any) => {
 		goto(`/app/books/?type=${data.isPublic ? 'public' : 'private'}&search=${e.target.value}`);
 	}, 200);
@@ -259,7 +278,11 @@
 										</svg>
 									{/if}
 								</button>
-								<a href={`/app/books/${book.$id}`} class="btn btn-primary">Rewrite book</a>
+
+								<a href={`/app/books/${book.$id}`} class="btn btn-primary btn-ghost">All pages</a>
+								<a href={`/app/books/${book.$id}/${getNextPage(book.$id)}`} class="btn btn-primary"
+									>Open page {getNextPage(book.$id)}</a
+								>
 							</div>
 						</div>
 					</div>

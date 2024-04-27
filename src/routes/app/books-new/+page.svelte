@@ -118,7 +118,7 @@
 					bind:files
 					required={true}
 					type="file"
-					accept=".epub"
+					accept=".epub,.pdf"
 					class="file-input file-input-bordered w-full"
 				/>
 			</label>

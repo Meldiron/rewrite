@@ -21,6 +21,7 @@
 	let inputEl: HTMLInputElement;
 
 	$: data, scrollToBottom();
+	$: data, reloadStats();
 
 	function scrollToBottom() {
 		setTimeout(() => {
@@ -60,14 +61,38 @@
 	let activeWord = 0;
 	let correctLetters = 0;
 	let wrongLetters = 0;
+	reloadStats();
 
-	$: {
-		if (data) {
+	function reloadStats() {
+		correctLetters = 0;
+		wrongLetters = 0;
+
+		const key = `${data.book.$id}-${data.page.page}`;
+		const autoSaves = JSON.parse(localStorage.getItem('autoSaves') ?? '{}');
+
+		if (!autoSaves[key]) {
 			activeLine = 0;
 			activeWord = 0;
-			correctLetters = 0;
-			wrongLetters = 0;
+		} else {
+			activeLine = autoSaves[key].activeLine;
+			activeWord = autoSaves[key].activeWord;
 		}
+	}
+
+	$: activeLine, autoSave();
+	$: activeWord, autoSave();
+
+	function autoSave() {
+		const key = `${data.book.$id}-${data.page.page}`;
+		const autoSaves = JSON.parse(localStorage.getItem('autoSaves') ?? '{}');
+		if (!autoSaves[key]) {
+			autoSaves[key] = {};
+		}
+
+		autoSaves[key].activeLine = activeLine;
+		autoSaves[key].activeWord = activeWord;
+
+		localStorage.setItem('autoSaves', JSON.stringify(autoSaves));
 	}
 
 	$: currentWord = linesOfWords[activeLine][activeWord];
@@ -372,7 +397,7 @@
 			on:click={() => (currentMainTab = 'screenshot')}
 			class={`${currentMainTab === 'screenshot' ? 'bg-base-100' : 'bg-base-200'} text-xs border-white w-[fit-content] px-3 py-2 pb-1 rounded-md rounded-b-none pb-3`}
 		>
-			Book screenshot
+			Page screenshot
 		</button>
 	</div>
 	<div
@@ -468,7 +493,7 @@
 				<button on:click={() => (endLevelModalOpened = false)} class="btn">Close</button>
 				<a
 					on:click={() => (endLevelModalOpened = false)}
-					href="/app/unlocks"
+					href={`/app/books/${data.book.$id}/${data.page.page + 1}`}
 					class="btn btn-primary">Next Page</a
 				>
 			</div>

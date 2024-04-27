@@ -1,7 +1,8 @@
 Now:
 
+TODO: ActivateLicenseKey into REST API using Appexpress
+TODO: Rename details about page
 TODO: Improve post-page modal with stats. Show level progress, streak if relevant, ...
-TODO: blurhash for pages?
 TODO: Pagination on pages of book
 
 With progress:

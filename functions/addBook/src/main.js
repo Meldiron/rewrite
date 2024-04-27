@@ -111,12 +111,17 @@ export default async ({ req, res, log, error }) => {
 
   log('Dowloading source file: ' + fileId);
 
+  const fileMetadata = await storage.getFile('books', fileId);
+
+  const nameChunks = fileMetadata.name.split('.');
+  const extension = nameChunks[nameChunks.length - 1];
+
   const arrayBuffer = await storage.getFileDownload('books', fileId);
 
   log('Saving source file');
 
   const buffer = Buffer.from(new Uint8Array(arrayBuffer));
-  await fs.writeFile(`./job_${jobId}.epub`, buffer);
+  await fs.writeFile(`./job_${jobId}.${extension}`, buffer);
 
   let existedBefore = false;
   let existingDoc = null;
@@ -130,17 +135,20 @@ export default async ({ req, res, log, error }) => {
   if (!existedBefore) {
     log('Extracting metadata');
 
-    const epubObj = await parseEpub(`./job_${jobId}.epub`, {
-      type: 'path',
-    });
+    let title = 'Unknown title';
+    let author = 'Unknown author';
+    let publisher = 'Unknown publisher';
+    if (extension === 'epub') {
+      const epubObj = await parseEpub(`./job_${jobId}.${extension}`, {
+        type: 'path',
+      });
 
-    log(epubObj.info);
+      log(epubObj.info);
 
-    let { title, author, publisher } = epubObj.info;
-
-    title = title ? title : 'Unknown title';
-    author = author ? author : 'Unknown author';
-    publisher = publisher ? publisher : 'Unknown publisher';
+      title = epubObj.info.title ? epubObj.info.title : title;
+      author = epubObj.info.author ? epubObj.info.author : author;
+      publisher = epubObj.info.publisher ? epubObj.info.publisher : publisher;
+    }
 
     log('Storing data about book');
 
@@ -173,11 +181,14 @@ export default async ({ req, res, log, error }) => {
     log('Old Job ID: ' + jobIdUuid);
   } else {
     const convertRequest = new FormData();
-    convertRequest.append('convert_to', 'epub-png');
+
+    const convertAction = extension === 'pdf' ? 'pdf-png' : 'epub-png';
+
+    convertRequest.append('convert_to', convertAction);
     convertRequest.append(
       'files',
-      new Blob([await fs.readFile(`./job_${jobId}.epub`)]),
-      `job_${jobId}.epub`
+      new Blob([await fs.readFile(`./job_${jobId}.${extension}`)]),
+      `job_${jobId}.${extension}`
     );
     const convertResponse = await axios.default.post(
       'https://api.epub.to/v1/convert/',
