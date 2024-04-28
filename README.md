@@ -1,4 +1,16 @@
-Now:
+# 💻 Rewrite_ 
+
+Practice typing skills and speed by rewritting books as you read them. Use your own books for learning or entertainment.
+
+![Screenshots](docs/ss1.png)
+
+![Screenshots](docs/ss2.png)
+
+![Screenshots](docs/ss3.png)
+
+![Screenshots](docs/ss4.png)
+
+# 🗒️ Project-specific TODOs
 
 TODO: If page doesnt exist, back go book all apges
 TODO: Nicer design for when book is finished
@@ -7,12 +19,14 @@ TODO: Rename details about page (using Appexpress)
 TODO: Improve post-page modal with stats. Show level progress, streak if relevant, ...
 TODO: Pagination on pages of book
 
-With progress:
+---
+
 TODO: Badges (with level unlock), monthly too?
 TODO: Quests (with level unlock)
 TODO: Quest points store
 
-Later:
+---
+
 TODO: Top100 books
 TODO: Update favicon and SEO stuff
 TODO: Community goals
@@ -39,7 +53,7 @@ Badges:
 - X words with accent senstivity
 ```
 
-# create-svelte
+# 🤖 Auto-generated docs
 
 Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
 
