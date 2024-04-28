@@ -84,7 +84,7 @@
 		try {
 			$toastStore = { type: 'info', text: 'Activating key...' };
 
-			const response = await functions.createExecution('activateLicenseKey', licenseKey);
+			const response = await functions.createExecution('api', licenseKey, false, '/v1/tokens', 'POST');
 
 			$toastStore = {
 				type: response.responseStatusCode === 200 ? 'success' : 'error',
@@ -153,7 +153,7 @@
 			<input type="radio" name="my-accordion-2" checked={true} />
 			<div class="collapse-title text-xl font-medium">What are tokens?</div>
 			<div class="collapse-content">
-				<p>
+				<p class="text-primary">
 					When preparing e-book for rewritting, we use external technologies which are not free. To
 					cover the costs, we use tokens. Each token allows you to upload 1 e-book.
 				</p>
@@ -163,7 +163,7 @@
 			<input type="radio" name="my-accordion-2" />
 			<div class="collapse-title text-xl font-medium">How do I get tokens?</div>
 			<div class="collapse-content">
-				<p>
+				<p class="text-primary">
 					To purchase tokens, visit <a
 						href="https://rewrite.lemonsqueezy.com/buy/4b9e076e-6016-45c6-9681-f26b7d94af27"
 						class="text-primary underline"
@@ -177,7 +177,7 @@
 			<input type="radio" name="my-accordion-2" />
 			<div class="collapse-title text-xl font-medium">How do I activate key?</div>
 			<div class="collapse-content">
-				<p>
+				<p class="text-primary">
 					After the payment, you will be given license key. You also recieve email recipe which
 					includes this key, in case you left the website after payment by mistake.
 				</p>
@@ -212,7 +212,7 @@
 			<input type="radio" name="my-accordion-2" />
 			<div class="collapse-title text-xl font-medium">What if I cannot afford it?</div>
 			<div class="collapse-content">
-				<p>
+				<p class="text-primary">
 					Our goal with tokens isn't to make a profit, instead, to cover expenses to keep Rewrite
 					running. If your situation doesn't allow you to purchase tokens and you are vividly
 					looking forward using Rewrite with your own books, please contact me at

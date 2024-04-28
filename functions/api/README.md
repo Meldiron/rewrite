@@ -1,4 +1,4 @@
-# activateLicenseKey
+# Rest API
 
 ## 🧰 Usage
 
