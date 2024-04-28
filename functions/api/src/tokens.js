@@ -9,18 +9,6 @@ TokensRouter.post('/', async (req, res) => {
   const userId = req.headers['x-appwrite-user-id'] ?? null;
   const licenseKey = req.bodyRaw ?? null;
 
-  let userExists = false;
-  try {
-    if (userId) {
-      await users.get(userId);
-      userExists = true;
-    }
-  } catch (err) {}
-
-  if (!userExists) {
-    return res.send('Only users can activate license key.', 400);
-  }
-
   if (!licenseKey) {
     return res.send('Please provide license key.', 400);
   }
