@@ -2,7 +2,6 @@ Now:
 
 TODO: If page doesnt exist, back go book all apges
 TODO: Nicer design for when book is finished
-TODO: ActivateLicenseKey into REST API using Appexpress
 TODO: Rename details about page (using Appexpress)
 
 TODO: Improve post-page modal with stats. Show level progress, streak if relevant, ...
