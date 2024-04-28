@@ -13,8 +13,8 @@ export function hasStreak(streakDate: string | null) {
 	);
 }
 
-export function hasStreakOnDate(lastStreakDate: string|null, streak: number, daysDiff: number) {
-	if(!lastStreakDate) {
+export function hasStreakOnDate(lastStreakDate: string | null, streak: number, daysDiff: number) {
+	if (!lastStreakDate) {
 		return false;
 	}
 
@@ -30,8 +30,7 @@ export function hasStreakOnDate(lastStreakDate: string|null, streak: number, day
 
 	daysDiff *= -1;
 
-
-	const maxAllowedNumber = hasToday ? (streak-1) : streak;
+	const maxAllowedNumber = hasToday ? streak - 1 : streak;
 
 	console.log(maxAllowedNumber);
 

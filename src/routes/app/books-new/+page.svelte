@@ -84,7 +84,13 @@
 		try {
 			$toastStore = { type: 'info', text: 'Activating key...' };
 
-			const response = await functions.createExecution('api', licenseKey, false, '/v1/tokens', 'POST');
+			const response = await functions.createExecution(
+				'api',
+				licenseKey,
+				false,
+				'/v1/tokens',
+				'POST'
+			);
 
 			$toastStore = {
 				type: response.responseStatusCode === 200 ? 'success' : 'error',

@@ -1,4 +1,4 @@
-import AppExpress from "@itznotabug/appexpress";
+import AppExpress from '@itznotabug/appexpress';
 import { TokensRouter } from './tokens.js';
 
 const appExpress = new AppExpress();
