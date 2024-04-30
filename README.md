@@ -23,7 +23,6 @@ Practice typing skills and speed by rewritting books as you read them. Use your 
 # 🗒️ Project-specific TODOs
 
 TODO: Fix payments, ensure 100% sale works
-TODO: Rename details about page
 TODO: Improve post-page modal with stats. Show level progress, streak if relevant, ...
 TODO: Pagination on pages of book
 

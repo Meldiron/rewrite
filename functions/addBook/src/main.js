@@ -136,8 +136,6 @@ export default async ({ req, res, log, error }) => {
     log('Extracting metadata');
 
     let title = 'Unknown title';
-    let author = 'Unknown author';
-    let publisher = 'Unknown publisher';
     if (extension === 'epub') {
       try {
         const epubObj = await parseEpub(`./job_${jobId}.${extension}`, {
@@ -147,8 +145,6 @@ export default async ({ req, res, log, error }) => {
         log(epubObj.info);
 
         title = epubObj.info.title ? epubObj.info.title : title;
-        author = epubObj.info.author ? epubObj.info.author : author;
-        publisher = epubObj.info.publisher ? epubObj.info.publisher : publisher;
       } catch (err) {
         log(err);
       }
@@ -156,7 +152,7 @@ export default async ({ req, res, log, error }) => {
 
     log('Storing data about book');
 
-    let search = `${title.toLowerCase()} ${author.toLowerCase()} ${publisher.toLowerCase()}`;
+    let search = `${title.toLowerCase()}`;
     search += ' ' + latinize('search');
 
     existingDoc = await databases.createDocument(
@@ -166,8 +162,6 @@ export default async ({ req, res, log, error }) => {
       {
         isPublic: userExists === true ? false : true,
         title,
-        author,
-        publisher,
         ready: false,
         pages: 0,
         search,

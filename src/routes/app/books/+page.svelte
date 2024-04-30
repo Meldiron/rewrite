@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto, invalidateAll } from '$app/navigation';
-	import { databases, storage } from '$lib/appwrite';
+	import { databases, functions, storage } from '$lib/appwrite';
 	import { profileMenuStore, toastStore } from '$lib/stores';
 	import { Query } from 'appwrite';
 	import type { PageData } from './$types';
@@ -93,6 +93,44 @@
 	const handleSearch = debounce((e: any) => {
 		goto(`/app/books/?type=${data.isPublic ? 'public' : 'private'}&search=${e.target.value}`);
 	}, 200);
+
+	let edittingSubitting = false;
+	let edittingId = '';
+	let edittingTitle = '';
+
+	async function saveEditingBook() {
+		if (edittingSubitting) {
+			return;
+		}
+
+		edittingSubitting = true;
+
+		try {
+			const response = await functions.createExecution(
+				'api',
+				JSON.stringify({
+					title: edittingTitle
+				}),
+				false,
+				`/v1/books/${edittingId}/metadata`,
+				'PUT'
+			);
+
+			$toastStore = {
+				type: response.responseStatusCode === 200 ? 'success' : 'error',
+				text: response.responseBody
+			};
+
+			edittingTitle = '';
+			edittingId = '';
+
+			await invalidateAll();
+		} catch (error) {
+			throw error;
+		} finally {
+			edittingSubitting = false;
+		}
+	}
 </script>
 
 {#if data.isPublic === false && getLevel(data.profile.xp) < 3}
@@ -260,10 +298,86 @@
 									max={book.pages}
 								></progress>
 
-								<h2 class="card-title text-primary">{book.title}</h2>
+								{#if edittingId !== book.$id}
+									<h2 class="card-title text-primary">{book.title}</h2>
+								{:else}
+									<input
+										disabled={edittingSubitting}
+										bind:value={edittingTitle}
+										type="text"
+										placeholder="Book title"
+										class="input input-bordered w-full input-lg"
+									/>
+								{/if}
 								<div class="h-full">
-									<p class="text-semibold">{book.author}</p>
-									<p class="mt-2 text-sm opacity-50">{book.publisher}</p>
+									{#if edittingId !== book.$id}
+										<button
+											disabled={edittingSubitting}
+											on:click={() => {
+												edittingTitle = book.title;
+												edittingId = book.$id;
+											}}
+											class="btn btn-content btn-ghost btn-active btn-sm"
+										>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke-width="1.5"
+												stroke="currentColor"
+												class="w-4 h-4"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
+												/>
+											</svg>
+										</button>
+									{:else}
+										<button
+											disabled={edittingSubitting}
+											on:click={() => {
+												edittingTitle = '';
+												edittingId = '';
+											}}
+											class="btn btn-content btn-ghost btn-sm"
+										>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke-width="1.5"
+												stroke="currentColor"
+												class="w-4 h-4"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													d="M6 18 18 6M6 6l12 12"
+												/>
+											</svg>
+										</button>
+										<button
+											on:click={saveEditingBook}
+											class="btn btn-content btn-ghost btn-active btn-sm"
+										>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke-width="1.5"
+												stroke="currentColor"
+												class="w-4 h-4"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													d="m4.5 12.75 6 6 9-13.5"
+												/>
+											</svg>
+										</button>
+									{/if}
 								</div>
 								<div class="card-actions justify-end">
 									<button

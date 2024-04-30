@@ -122,26 +122,6 @@
 					"default": null
 				},
 				{
-					"key": "author",
-					"type": "string",
-					"status": "available",
-					"error": "",
-					"required": true,
-					"array": false,
-					"size": 2048,
-					"default": null
-				},
-				{
-					"key": "publisher",
-					"type": "string",
-					"status": "available",
-					"error": "",
-					"required": true,
-					"array": false,
-					"size": 2048,
-					"default": null
-				},
-				{
 					"key": "ready",
 					"type": "boolean",
 					"status": "available",

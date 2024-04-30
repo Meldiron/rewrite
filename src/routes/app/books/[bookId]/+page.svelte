@@ -104,45 +104,64 @@
 		</div>
 	</div>
 
-	<div class="card bg-base-100 shadow-xl p-3">
-		<div class="overflow-x-auto">
-			<table class="table table-zebra table-lg">
-				<thead>
-					<tr>
-						<th class="font-bold">Page</th>
-						<td>Length</td>
-						<td>Completed</td>
-						<th></th>
-					</tr>
-				</thead>
-				<tbody>
-					{#each tableDocuments as page}
-						<tr>
-							<th class="font-bold">{page.page}</th>
-							<td>{page.words ?? 0} words</td>
-							<td>
-								{#if data.finishedPageNumbers.includes(page.page)}
-									<div class="badge">Yes</div>
-								{:else}
-									<div class="badge badge-error">No</div>
-								{/if}
-							</td>
-							<td class="float-right">
-								{#if !data.finishedPageNumbers.includes(page.page)}<a
-										href={`/app/books/${data.book.$id}/${page.page}`}
-										class={`btn btn-sm btn-ghost ${page.page === nextPage ? 'btn-active' : ''}`}
-										>Rewrite page</a
-									>
-								{:else}
-									<a href={`/app/books/${data.book.$id}/${page.page}`} class="btn btn-sm btn-ghost"
-										>View page</a
-									>
-								{/if}</td
-							>
-						</tr>
-					{/each}
-				</tbody>
-			</table>
+	{#if tableDocuments.length === 0}
+		<div role="alert" class="alert bg-base-100">
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				fill="none"
+				viewBox="0 0 24 24"
+				class="stroke-info shrink-0 w-6 h-6"
+				><path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+				></path></svg
+			>
+			<span>No pages found left.</span>
 		</div>
-	</div>
+	{:else}
+		<div class="card bg-base-100 shadow-xl p-3">
+			<div class="overflow-x-auto">
+				<table class="table table-zebra table-lg">
+					<thead>
+						<tr>
+							<th class="font-bold">Page</th>
+							<td>Length</td>
+							<td>Completed</td>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each tableDocuments as page}
+							<tr>
+								<th class="font-bold">{page.page}</th>
+								<td>{page.words ?? 0} words</td>
+								<td>
+									{#if data.finishedPageNumbers.includes(page.page)}
+										<div class="badge">Yes</div>
+									{:else}
+										<div class="badge badge-error">No</div>
+									{/if}
+								</td>
+								<td class="float-right">
+									{#if !data.finishedPageNumbers.includes(page.page)}<a
+											href={`/app/books/${data.book.$id}/${page.page}`}
+											class={`btn btn-sm btn-ghost ${page.page === nextPage ? 'btn-active' : ''}`}
+											>Rewrite page</a
+										>
+									{:else}
+										<a
+											href={`/app/books/${data.book.$id}/${page.page}`}
+											class="btn btn-sm btn-ghost">View page</a
+										>
+									{/if}</td
+								>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	{/if}
 </div>
