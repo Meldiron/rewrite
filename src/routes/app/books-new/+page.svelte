@@ -171,7 +171,7 @@
 			<div class="collapse-content">
 				<p class="text-primary">
 					To purchase tokens, visit <a
-						href="https://rewrite.lemonsqueezy.com/buy/4b9e076e-6016-45c6-9681-f26b7d94af27"
+						href="https://rewrite.lemonsqueezy.com/buy/1e49884c-71ad-439b-a967-48ebc8da8d33"
 						class="text-primary underline"
 						target="_blank">Rewrite store</a
 					>. We offer multiple variants to make it cheaper when purchasing larger package. After

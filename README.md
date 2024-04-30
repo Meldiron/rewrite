@@ -1,6 +1,16 @@
-# 💻 Rewrite_ 
+# 💻 Rewrite\_
 
 Practice typing skills and speed by rewritting books as you read them. Use your own books for learning or entertainment.
+
+- ✅ Custom .EPUB and PDF files
+- ✅ Public library
+- ✅ Leveling system with unlocks
+- ✅ Streaks
+- ✅ Configurable difficulty
+- ⏳ Stats and badges
+- ⏳ Quests and reward shop
+- ⏳ Public ceaderboards
+- ⏳ Community events and goals
 
 ![Screenshots](docs/ss1.png)
 
@@ -12,10 +22,8 @@ Practice typing skills and speed by rewritting books as you read them. Use your 
 
 # 🗒️ Project-specific TODOs
 
-TODO: If page doesnt exist, back go book all apges
-TODO: Nicer design for when book is finished
-TODO: Rename details about page (using Appexpress)
-
+TODO: Fix payments, ensure 100% sale works
+TODO: Rename details about page
 TODO: Improve post-page modal with stats. Show level progress, streak if relevant, ...
 TODO: Pagination on pages of book
 
@@ -28,8 +36,9 @@ TODO: Quest points store
 ---
 
 TODO: Top100 books
-TODO: Update favicon and SEO stuff
+TODO: Update SEO stuff
 TODO: Community goals
+TODO: Friend leaderboards
 
 ```markdown
 Levels left: 20, 75?

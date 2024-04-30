@@ -139,15 +139,19 @@ export default async ({ req, res, log, error }) => {
     let author = 'Unknown author';
     let publisher = 'Unknown publisher';
     if (extension === 'epub') {
-      const epubObj = await parseEpub(`./job_${jobId}.${extension}`, {
-        type: 'path',
-      });
+      try {
+        const epubObj = await parseEpub(`./job_${jobId}.${extension}`, {
+          type: 'path',
+        });
 
-      log(epubObj.info);
+        log(epubObj.info);
 
-      title = epubObj.info.title ? epubObj.info.title : title;
-      author = epubObj.info.author ? epubObj.info.author : author;
-      publisher = epubObj.info.publisher ? epubObj.info.publisher : publisher;
+        title = epubObj.info.title ? epubObj.info.title : title;
+        author = epubObj.info.author ? epubObj.info.author : author;
+        publisher = epubObj.info.publisher ? epubObj.info.publisher : publisher;
+      } catch (err) {
+        log(err);
+      }
     }
 
     log('Storing data about book');

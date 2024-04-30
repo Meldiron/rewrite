@@ -31,12 +31,27 @@ export const load: PageLoad = async ({ parent, url }) => {
 	return {
 		books: {
 			...books,
-			documents: books.documents.sort((a, b) => {
-				const aStarred = data.profile.pinnedBooks.includes(a.$id);
-				const bStarred = data.profile.pinnedBooks.includes(b.$id);
+			documents: books.documents
+				.sort((a, b) => {
+					const aProgress =
+						finishes.documents.find((f) => f.bookId === a.$id)?.pageNumbers?.length ?? 0;
+					const bProgress =
+						finishes.documents.find((f) => f.bookId === b.$id)?.pageNumbers?.length ?? 0;
 
-				return aStarred === bStarred ? 0 : aStarred ? -1 : 1;
-			})
+					const aIsFinished = aProgress === a.pages;
+					const bIsFinished = bProgress === b.pages;
+
+					if (aIsFinished === bIsFinished) {
+						return 0;
+					}
+					return aIsFinished ? 1 : -1;
+				})
+				.sort((a, b) => {
+					const aStarred = data.profile.pinnedBooks.includes(a.$id);
+					const bStarred = data.profile.pinnedBooks.includes(b.$id);
+
+					return aStarred === bStarred ? 0 : aStarred ? -1 : 1;
+				})
 		},
 		finishes,
 		isPublic,

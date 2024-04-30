@@ -16,13 +16,11 @@ TokensRouter.put('/:bookId/metadata', async (req, res) => {
 
   const book = await databases.getDocument('main', 'books', bookId);
 
-  const isAllowed = book.$permissions.filter((p) => p.includes(userId)).length > 0;
+  const isAllowed =
+    book.$permissions.filter((p) => p.includes(userId)).length > 0;
 
-  if(!isAllowed) {
-    return res.send(
-      `You don't have access to this book.`,
-      403
-    );
+  if (!isAllowed) {
+    return res.send(`You don't have access to this book.`, 403);
   }
 
   await databases.updateDocument('main', 'books', bookId, {
@@ -31,8 +29,5 @@ TokensRouter.put('/:bookId/metadata', async (req, res) => {
     publisher: body.publisher,
   });
 
-  return res.send(
-    `Book details saved.`,
-    200
-  );
+  return res.send(`Book details saved.`, 200);
 });
