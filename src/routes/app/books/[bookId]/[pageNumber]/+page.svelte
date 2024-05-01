@@ -89,8 +89,8 @@
 			autoSaves[key] = {};
 		}
 
-		autoSaves[key].activeLine = activeLine;
-		autoSaves[key].activeWord = activeWord;
+		autoSaves[key].activeLine = Math.max(activeLine, 0);
+		autoSaves[key].activeWord = Math.max(activeWord, 0);
 
 		localStorage.setItem('autoSaves', JSON.stringify(autoSaves));
 	}
@@ -129,18 +129,18 @@
 			});
 		}
 
+		let totalStreak = data.profile.totalStreak ?? 0;
+
 		let streak = data.profile.streak ?? 0;
 		if (!hasStreak(data.profile.lastStreakDate)) {
 			streak++;
+			totalStreak++;
 		}
 
 		let maxStreak = data.profile.maxStreak ?? 0;
 		if (streak > maxStreak) {
 			maxStreak = streak;
 		}
-
-		let totalStreak = data.profile.totalStreak ?? 0;
-		totalStreak++;
 
 		const xpToAdd = data.page.text.split(' ').join('').split('\n').join('').length;
 		const wordsToAdd = data.page.text.split('\n').join(' ').split(' ').length;
@@ -195,6 +195,8 @@
 		autoSaves[key].activeWord = 0;
 		activeLine = 0;
 		activeWord = 0;
+		correctLetters = 0;
+		wrongLetters = 0;
 
 		localStorage.setItem('autoSaves', JSON.stringify(autoSaves));
 	}
@@ -242,11 +244,7 @@
 		}
 	}
 
-	async function handleWord(word: string, target: any) {
-		if (data.isCompleted) {
-			return;
-		}
-
+	async function handleWord(word: string, target: any, isWildcard = false) {
 		correctLetters = 0;
 		wrongLetters = 0;
 
@@ -272,7 +270,18 @@
 			if (letterCopy === correctLetterCopy && wrongLetters === 0) {
 				correctLetters++;
 			} else {
-				wrongLetters++;
+				if (isWildcard && wrongLetters === 0) {
+					const pattern = /^[0-9a-zA-Z]*$/;
+					if (pattern.test(correctLetterCopy)) {
+						wrongLetters++;
+					} else {
+						correctLetters++;
+						target.value = target.value.slice(0, i) + correctLetter + target.value.slice(i + 1);
+						isWildcard = false;
+					}
+				} else {
+					wrongLetters++;
+				}
 			}
 
 			i++;
@@ -291,21 +300,18 @@
 			return;
 		}
 
-		if (
-			e.key.toLowerCase() === 'enter' &&
-			(e.target.value[e.target.value.length - 1] ?? '') !== ' '
-		) {
+		if (e.key.toLowerCase() === 'enter') {
 			if (e.metaKey || e.ctrlKey) {
 				onSkipWord();
 			} else {
 				e.target.value += ' ';
-				handleWord(e.target.value, e.target);
+				handleWord(e.target.value, e.target, true);
 			}
 		}
 	}
 
 	function onChange(e: any) {
-		handleWord(e.target.value, e.target);
+		handleWord(e.target.value, e.target, e.data === ' ');
 	}
 
 	let secondsLeft = 0;
@@ -316,8 +322,6 @@
 		if (!canSkip) {
 			return;
 		}
-
-		const currentLevel = getLevel(data.profile.xp);
 
 		secondsLeft = 3;
 		canSkip = false;
@@ -395,16 +399,16 @@
 		</div>
 	{/if}
 
-	<div class="flex gap-3">
+	<div class="flex gap-3 sticky top-[60px] z-[20] backdrop-blur-sm w-[fit-content] p-3 rounded-xl">
 		<button
 			on:click={() => (currentMainTab = 'text')}
-			class={`${currentMainTab === 'text' ? 'bg-base-100' : 'bg-base-200'} text-xs border-white w-[fit-content] px-3 py-2 pb-1 rounded-md rounded-b-none pb-3`}
+			class={`${currentMainTab === 'text' ? 'bg-white text-black' : 'bg-base-300'} text-xs w-[fit-content] px-3 py-2 pb-1 rounded-md pb-3`}
 		>
 			Page to rewrite
 		</button>
 		<button
 			on:click={() => (currentMainTab = 'screenshot')}
-			class={`${currentMainTab === 'screenshot' ? 'bg-base-100' : 'bg-base-200'} text-xs border-white w-[fit-content] px-3 py-2 pb-1 rounded-md rounded-b-none pb-3`}
+			class={`${currentMainTab === 'screenshot' ? 'bg-white text-black' : 'bg-base-300'} text-xs w-[fit-content] px-3 py-2 pb-1 rounded-md pb-3`}
 		>
 			Page screenshot
 		</button>
@@ -414,44 +418,31 @@
 	>
 		<img src={fileUrl} alt="Screenshot" class="rounded-md" />
 	</div>
-	<label class={`${currentMainTab === 'text' ? '' : 'hidden'} swap`}>
-		<!-- this hidden checkbox controls the state -->
-		<input type="checkbox" />
-
-		<div
-			class={`swap-off card relative rounded-tl-none rounded-md bg-base-100 shadow-xl p-3 text-xl`}
-		>
-			{#each linesOfWords as words, lineIndex}
-				<p class="my-1 flex flex-wrap gap-1 text-primary text-opacity-60">
-					{#each words as word, wordIndex}
-						{@const isActiveLine = activeLine === lineIndex}
-						{@const isActiveWord = isActiveLine && activeWord === wordIndex}
-						<span>
-							{#each word.split('') as letter, letterIndex}
-								{@const isGreen =
-									activeLine > lineIndex ||
-									(isActiveWord && letterIndex < correctLetters) ||
-									(isActiveLine && activeWord > wordIndex)}
-								{@const isRed = isActiveWord && letterIndex < correctLetters + wrongLetters}
-								<span
-									class={`${isActiveWord ? 'underline' : ''} ${isGreen ? 'text-success' : ''} ${isRed ? 'text-error' : ''}`}
-									>{letter}</span
-								>
-							{/each}
-						</span>
-					{/each}
-				</p>
-			{/each}
-		</div>
-
-		<div class="swap-on">
-			<div
-				class={`swap-off card relative rounded-tl-none rounded-md bg-base-100 shadow-xl p-3 text-xl`}
-			>
-				<img src={fileUrl} alt="Screenshot" class="rounded-md" />
-			</div>
-		</div>
-	</label>
+	<div
+		class={`${currentMainTab === 'text' ? '' : 'hidden'} card relative rounded-md ${data.isCompleted ? 'bg-success bg-opacity-10' : 'bg-base-100'} shadow-xl p-3 text-xl`}
+	>
+		{#each linesOfWords as words, lineIndex}
+			<p class="my-1 flex flex-wrap gap-1 text-primary text-opacity-60">
+				{#each words as word, wordIndex}
+					{@const isActiveLine = activeLine === lineIndex}
+					{@const isActiveWord = isActiveLine && activeWord === wordIndex}
+					<span>
+						{#each word.split('') as letter, letterIndex}
+							{@const isGreen =
+								activeLine > lineIndex ||
+								(isActiveWord && letterIndex < correctLetters) ||
+								(isActiveLine && activeWord > wordIndex)}
+							{@const isRed = isActiveWord && letterIndex < correctLetters + wrongLetters}
+							<span
+								class={`${isActiveWord ? 'underline' : ''} ${isGreen ? 'text-success' : ''} ${isRed ? 'text-error' : ''}`}
+								>{letter}</span
+							>
+						{/each}
+					</span>
+				{/each}
+			</p>
+		{/each}
+	</div>
 </div>
 
 <div
