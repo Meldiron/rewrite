@@ -414,31 +414,44 @@
 	>
 		<img src={fileUrl} alt="Screenshot" class="rounded-md" />
 	</div>
-	<div
-		class={`${currentMainTab === 'text' ? '' : 'hidden'} card relative rounded-tl-none rounded-md bg-base-100 shadow-xl p-3 text-xl`}
-	>
-		{#each linesOfWords as words, lineIndex}
-			<p class="my-1 flex flex-wrap gap-1 text-primary text-opacity-60">
-				{#each words as word, wordIndex}
-					{@const isActiveLine = activeLine === lineIndex}
-					{@const isActiveWord = isActiveLine && activeWord === wordIndex}
-					<span>
-						{#each word.split('') as letter, letterIndex}
-							{@const isGreen =
-								activeLine > lineIndex ||
-								(isActiveWord && letterIndex < correctLetters) ||
-								(isActiveLine && activeWord > wordIndex)}
-							{@const isRed = isActiveWord && letterIndex < correctLetters + wrongLetters}
-							<span
-								class={`${isActiveWord ? 'underline' : ''} ${isGreen ? 'text-success' : ''} ${isRed ? 'text-error' : ''}`}
-								>{letter}</span
-							>
-						{/each}
-					</span>
-				{/each}
-			</p>
-		{/each}
-	</div>
+	<label class={`${currentMainTab === 'text' ? '' : 'hidden'} swap`}>
+		<!-- this hidden checkbox controls the state -->
+		<input type="checkbox" />
+
+		<div
+			class={`swap-off card relative rounded-tl-none rounded-md bg-base-100 shadow-xl p-3 text-xl`}
+		>
+			{#each linesOfWords as words, lineIndex}
+				<p class="my-1 flex flex-wrap gap-1 text-primary text-opacity-60">
+					{#each words as word, wordIndex}
+						{@const isActiveLine = activeLine === lineIndex}
+						{@const isActiveWord = isActiveLine && activeWord === wordIndex}
+						<span>
+							{#each word.split('') as letter, letterIndex}
+								{@const isGreen =
+									activeLine > lineIndex ||
+									(isActiveWord && letterIndex < correctLetters) ||
+									(isActiveLine && activeWord > wordIndex)}
+								{@const isRed = isActiveWord && letterIndex < correctLetters + wrongLetters}
+								<span
+									class={`${isActiveWord ? 'underline' : ''} ${isGreen ? 'text-success' : ''} ${isRed ? 'text-error' : ''}`}
+									>{letter}</span
+								>
+							{/each}
+						</span>
+					{/each}
+				</p>
+			{/each}
+		</div>
+
+		<div class="swap-on">
+			<div
+				class={`swap-off card relative rounded-tl-none rounded-md bg-base-100 shadow-xl p-3 text-xl`}
+			>
+				<img src={fileUrl} alt="Screenshot" class="rounded-md" />
+			</div>
+		</div>
+	</label>
 </div>
 
 <div
