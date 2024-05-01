@@ -37,7 +37,7 @@
 
 		if (data.tokens?.balance === 0) {
 			$toastStore = { type: 'error', text: "You don't have any tokens." };
-			// return;
+			return;
 		}
 
 		submitting = true;

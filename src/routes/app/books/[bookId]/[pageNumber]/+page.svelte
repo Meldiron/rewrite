@@ -98,6 +98,11 @@
 	$: currentWord = linesOfWords[activeLine][activeWord];
 
 	async function finishPage() {
+		if (data.isCompleted) {
+			$toastStore = { type: 'info', text: 'You have already rewritten this page.' };
+			return;
+		}
+
 		data.isCompleted = true;
 
 		$toastStore = { type: 'info', text: 'Saving...' };
@@ -179,6 +184,19 @@
 		endLevelModalOpened = true;
 		endLevelModalData.xp = xpToAdd;
 		endLevelModalData.words = wordsToAdd;
+
+		const key = `${data.book.$id}-${data.page.page}`;
+		const autoSaves = JSON.parse(localStorage.getItem('autoSaves') ?? '{}');
+		if (!autoSaves[key]) {
+			autoSaves[key] = {};
+		}
+
+		autoSaves[key].activeLine = 0;
+		autoSaves[key].activeWord = 0;
+		activeLine = 0;
+		activeWord = 0;
+
+		localStorage.setItem('autoSaves', JSON.stringify(autoSaves));
 	}
 
 	async function previousWord(target: any) {
@@ -301,16 +319,7 @@
 
 		const currentLevel = getLevel(data.profile.xp);
 
-		secondsLeft =
-			currentLevel >= 100
-				? 1
-				: currentLevel >= 50
-					? 3
-					: currentLevel >= 25
-						? 5
-						: currentLevel >= 10
-							? 10
-							: 15;
+		secondsLeft = 3;
 		canSkip = false;
 
 		if (secondsInterval) {
@@ -408,11 +417,6 @@
 	<div
 		class={`${currentMainTab === 'text' ? '' : 'hidden'} card relative rounded-tl-none rounded-md bg-base-100 shadow-xl p-3 text-xl`}
 	>
-		{#if data.isCompleted}
-			<div
-				class="absolute rounded-xl inset-0 bg-gradient-to-b from-[rgba(0,0,0,0.5)] via-[rgba(0,0,0,0.8)] to-[rgba(0,0,0,0.5)] flex items-start pt-4 justify-center pointer-events-none"
-			></div>
-		{/if}
 		{#each linesOfWords as words, lineIndex}
 			<p class="my-1 flex flex-wrap gap-1 text-primary text-opacity-60">
 				{#each words as word, wordIndex}
@@ -442,7 +446,6 @@
 >
 	<input
 		bind:this={inputEl}
-		disabled={data.isCompleted}
 		on:keydown={onKeyDown}
 		on:input={onChange}
 		type="text"

@@ -5,6 +5,6 @@ export const load: LayoutLoad = async ({ parent }) => {
 	const data = await parent();
 
 	if (data.user === null) {
-		redirect(307, '/auth');
+		redirect(307, '/');
 	}
 };

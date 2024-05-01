@@ -56,15 +56,8 @@ TokensRouter.post('/', async (req, res) => {
     return res.send('Cannot activate license key: ' + response.data.error, 400);
   }
 
-  const variantId = response.data.meta.variant_id;
-  const balanceToAdd =
-    variantId === 356052
-      ? 1
-      : variantId === 356053
-        ? 5
-        : variantId === 356054
-          ? 50
-          : 0;
+  const variantName = response.data.meta.variant_name;
+  const balanceToAdd = +(variantName.split(' ')[0] ?? 0);
 
   if (balanceToAdd === 0) {
     return res.send(

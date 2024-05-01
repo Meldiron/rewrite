@@ -14,11 +14,11 @@
 			</p>
 			<div class="flex flex-col sm:flex-row gap-4 w-full justify-center">
 				{#if data.user === null}
-					<a href="/auth/sign-in">
+					<a href="https://rewrite.authui.site/">
 						<button class="btn btn-active btn-ghost btn-wide">Sign In</button>
 					</a>
 
-					<a href="/auth/sign-in">
+					<a href="https://rewrite.authui.site/">
 						<button class="btn btn-active btn-outline btn-wide">Sign Up</button>
 					</a>
 				{:else}
@@ -26,7 +26,7 @@
 						<button class="btn btn-active btn-outline btn-wide">Public library</button>
 					</a>
 					<a href="/app/books?type=private">
-						<button class="btn btn-active btn-wide">My library</button>
+						<button class="btn btn-active btn-wide">Custom library</button>
 					</a>
 				{/if}
 			</div>

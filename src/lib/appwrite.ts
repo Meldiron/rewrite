@@ -2,7 +2,7 @@ import { Client, Account, Databases, Storage, Functions } from 'appwrite';
 
 const client = new Client();
 
-client.setEndpoint('https://cloud.appwrite.io/v1').setProject('rewrite');
+client.setEndpoint('https://appwrite.rewrite.almostapps.eu/v1').setProject('rewrite');
 
 export const account = new Account(client);
 export const databases = new Databases(client);

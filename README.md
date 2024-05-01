@@ -9,7 +9,7 @@ Practice typing skills and speed by rewritting books as you read them. Use your 
 - ✅ Configurable difficulty
 - ⏳ Stats and badges
 - ⏳ Quests and reward shop
-- ⏳ Public ceaderboards
+- ⏳ Public leaderboards
 - ⏳ Community events and goals
 
 ![Screenshots](docs/ss1.png)
@@ -22,9 +22,14 @@ Practice typing skills and speed by rewritting books as you read them. Use your 
 
 # 🗒️ Project-specific TODOs
 
-TODO: Fix payments, ensure 100% sale works
+TODO: New payment model
 TODO: Improve post-page modal with stats. Show level progress, streak if relevant, ...
 TODO: Pagination on pages of book
+TODO: Safer way to give back taken tokens if something fails
+TODO: Ability to delete book
+TODO: Screenshot always on
+TODO: Show current user details somewhere
+TODO: Buttons to go back always to go to public lib
 
 ---
 
