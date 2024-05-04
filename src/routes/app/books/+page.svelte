@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto, invalidateAll } from '$app/navigation';
-	import { databases, functions, storage } from '$lib/appwrite';
+	import { databases, functions, getFilePreview, storage } from '$lib/appwrite';
 	import { profileMenuStore, toastStore } from '$lib/stores';
 	import { Query } from 'appwrite';
 	import type { PageData } from './$types';
@@ -236,23 +236,21 @@
 								<div class="w-full aspect-[3/4] !w-[250px]">
 									<img
 										class="object-cover w-full h-full object-contain transform transition duration-300 scale-[100%] hover:scale-[110%]"
-										src={storage
-											.getFilePreview(
-												'pages',
-												`${book.$id}-1`,
-												1280,
-												undefined,
-												undefined,
-												undefined,
-												undefined,
-												undefined,
-												undefined,
-												undefined,
-												undefined,
-												undefined,
-												'webp'
-											)
-											.toString()}
+										src={getFilePreview(
+											'pages',
+											`${book.$id}-1`,
+											1280,
+											undefined,
+											undefined,
+											undefined,
+											undefined,
+											undefined,
+											undefined,
+											undefined,
+											undefined,
+											undefined,
+											'webp'
+										)}
 										alt="Book"
 									/>
 								</div>

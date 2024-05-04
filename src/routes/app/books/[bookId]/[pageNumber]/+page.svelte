@@ -1,19 +1,21 @@
 <script lang="ts">
-	import { databases, storage } from '$lib/appwrite';
+	import { databases, getFilePreview, storage } from '$lib/appwrite';
 	import { toastStore } from '$lib/stores';
 	import { ID, Query } from 'appwrite';
 	import type { PageData } from './$types';
 	import { invalidateAll } from '$app/navigation';
 	import { latinize } from '$lib/latinize';
-	import { getLevel, hasStreak, isStreakEnded } from '$lib/utils';
+	import { getLevel, getLevelProgress, getXpRemaining, hasStreak, isStreakEnded } from '$lib/utils';
 	import { onMount } from 'svelte';
 
 	export let data: PageData;
 
+	let isSavingProgress = false;
 	let endLevelModalOpened = false;
 	let endLevelModalData = {
 		xp: 0,
-		words: 0
+		accentXp: 0,
+		caseXp: 0
 	};
 
 	let currentMainTab: 'text' | 'screenshot' = 'text';
@@ -37,23 +39,21 @@
 	});
 
 	$: fileId = `${data.book.$id}-${data.page.page}`;
-	$: fileUrl = storage
-		.getFilePreview(
-			'pages',
-			fileId,
-			1920,
-			undefined,
-			undefined,
-			undefined,
-			undefined,
-			undefined,
-			undefined,
-			undefined,
-			undefined,
-			undefined,
-			'webp'
-		)
-		.toString();
+	$: fileUrl = getFilePreview(
+		'pages',
+		fileId,
+		1920,
+		undefined,
+		undefined,
+		undefined,
+		undefined,
+		undefined,
+		undefined,
+		undefined,
+		undefined,
+		undefined,
+		'webp'
+	);
 
 	$: linesOfWords = data.page.text.split('\n').map((line: string) => line.split(' '));
 
@@ -107,6 +107,57 @@
 
 		$toastStore = { type: 'info', text: 'Saving...' };
 
+		let totalStreak = data.profile.totalStreak ?? 0;
+
+		let streak = data.profile.streak ?? 0;
+		if (!hasStreak(data.profile.lastStreakDate)) {
+			streak++;
+			totalStreak++;
+		}
+
+		let maxStreak = data.profile.maxStreak ?? 0;
+		if (streak > maxStreak) {
+			maxStreak = streak;
+		}
+
+		const xpToAddBase = data.page.text.split(' ').join('').split('\n').join('').length;
+		const wordsToAdd = data.page.text.split('\n').join(' ').split(' ').length;
+
+		const xpToAddAccent =
+			data.user?.prefs.accentSensitivity === true ? Math.floor(xpToAddBase * 0.1) : 0;
+		const xpToAddCase =
+			data.user?.prefs.caseSensitivity === true ? Math.floor(xpToAddBase * 0.1) : 0;
+
+		let xp = data.profile.xp ?? 0;
+		xp += xpToAddBase;
+		xp += xpToAddAccent;
+		xp += xpToAddCase;
+
+		let wordsFinished = data.profile.wordsFinished ?? 0;
+		wordsFinished += wordsToAdd;
+
+		let pagesFinished = data.profile.pagesFinished ?? 0;
+		pagesFinished += 1;
+
+		let booksFinished = data.profile.booksFinished ?? 0;
+		if (data.totalFinishes + 1 >= data.totalPages) {
+			booksFinished += 1;
+		}
+
+		let lastStreakDate: string | null = new Date().toISOString();
+
+		if (isStreakEnded(data.profile.lastStreakDate)) {
+			streak = 0;
+			lastStreakDate = null;
+		}
+
+		endLevelModalOpened = true;
+		endLevelModalData.xp = xpToAddBase;
+		endLevelModalData.accentXp = xpToAddAccent;
+		endLevelModalData.caseXp = xpToAddCase;
+
+		isSavingProgress = true;
+
 		const finishes = await databases.listDocuments('main', 'finishes', [
 			Query.equal('bookId', data.book.$id),
 			Query.limit(1)
@@ -129,43 +180,6 @@
 			});
 		}
 
-		let totalStreak = data.profile.totalStreak ?? 0;
-
-		let streak = data.profile.streak ?? 0;
-		if (!hasStreak(data.profile.lastStreakDate)) {
-			streak++;
-			totalStreak++;
-		}
-
-		let maxStreak = data.profile.maxStreak ?? 0;
-		if (streak > maxStreak) {
-			maxStreak = streak;
-		}
-
-		const xpToAdd = data.page.text.split(' ').join('').split('\n').join('').length;
-		const wordsToAdd = data.page.text.split('\n').join(' ').split(' ').length;
-
-		let xp = data.profile.xp ?? 0;
-		xp += xpToAdd;
-
-		let wordsFinished = data.profile.wordsFinished ?? 0;
-		wordsFinished += wordsToAdd;
-
-		let pagesFinished = data.profile.pagesFinished ?? 0;
-		pagesFinished += 1;
-
-		let booksFinished = data.profile.booksFinished ?? 0;
-		if (data.totalFinishes + 1 >= data.totalPages) {
-			booksFinished += 1;
-		}
-
-		let lastStreakDate: string | null = new Date().toISOString();
-
-		if (isStreakEnded(data.profile.lastStreakDate)) {
-			streak = 0;
-			lastStreakDate = null;
-		}
-
 		await databases.updateDocument('main', 'profiles', data.profile.$id, {
 			lastStreakDate,
 			streak,
@@ -181,10 +195,6 @@
 
 		$toastStore = { type: 'success', text: 'Page marked as completed.' };
 
-		endLevelModalOpened = true;
-		endLevelModalData.xp = xpToAdd;
-		endLevelModalData.words = wordsToAdd;
-
 		const key = `${data.book.$id}-${data.page.page}`;
 		const autoSaves = JSON.parse(localStorage.getItem('autoSaves') ?? '{}');
 		if (!autoSaves[key]) {
@@ -199,6 +209,8 @@
 		wrongLetters = 0;
 
 		localStorage.setItem('autoSaves', JSON.stringify(autoSaves));
+
+		isSavingProgress = false;
 	}
 
 	async function previousWord(target: any) {
@@ -479,22 +491,45 @@
 		<div class="modal-box">
 			<h3 class="font-bold text-lg">Page complered</h3>
 			<p class="py-4 text-primary">You have successfully rewritten a page and earned rewards.</p>
+			<div class="flex flex-col gap-4">
+				<div class="flex gap-4 items-center">
+					<kbd class="kbd">{endLevelModalData.xp}</kbd> <span>Base XP</span>
+				</div>
+				<div class="flex gap-4 items-center">
+					<kbd class="kbd">{endLevelModalData.caseXp}</kbd> <span>Bonus for case sensitivity</span>
+				</div>
+				<div class="flex gap-4 items-center">
+					<kbd class="kbd">{endLevelModalData.accentXp}</kbd>
+					<span>Bonus for accent sensitivity</span>
+				</div>
+			</div>
 
-			<ul class="steps steps-vertical">
-				<li class="step">
-					<div class="flex gap-4 items-center">
-						<span>Level</span> <kbd class="kbd">+{endLevelModalData.xp} XP</kbd>
-					</div>
-				</li>
-				<li class="step">
-					<div class="flex gap-4 items-center">
-						<span>Words</span> <kbd class="kbd">+{endLevelModalData.words}</kbd>
-					</div>
-				</li>
-				<li class="step">
-					<div class="flex gap-4 items-center"><span>Pages</span> <kbd class="kbd">+1</kbd></div>
-				</li>
-			</ul>
+			<div class="divider"></div>
+
+			<div class="flex gap-4 items-center mt-4">
+				<kbd class="kbd"
+					>{endLevelModalData.accentXp + endLevelModalData.caseXp + endLevelModalData.xp}</kbd
+				> <span>Total XP</span>
+			</div>
+
+			<div class="my-4">
+				<div class="flex items-center justify-end gap-4">
+					<p class="text-primary">{getXpRemaining(data.profile.xp)} XP left</p>
+				</div>
+				{#if isSavingProgress}
+					<progress class="progress progress-base-200 w-full"></progress>
+				{:else}
+					<progress
+						class="progress progress-base-200 w-full"
+						value={getLevelProgress(data.profile.xp)}
+						max={100}
+					></progress>
+				{/if}
+				<div class="flex items-center justify-between gap-4">
+					<p>Level {getLevel(data.profile.xp)}</p>
+					<p>Level {getLevel(data.profile.xp) + 1}</p>
+				</div>
+			</div>
 
 			<div class="modal-action">
 				<button on:click={() => (endLevelModalOpened = false)} class="btn">Close</button>

@@ -676,7 +676,7 @@
 			<div class="modal-box">
 				<h3 class="font-bold text-lg">Level</h3>
 				<p class="py-4 text-primary">
-					Earn points for each rewritten letter and level up. There are rewards at specific level
+					Earn XP for each rewritten letter and level up. There are rewards at specific level
 					minestones.
 				</p>
 
@@ -684,11 +684,11 @@
 					<div class="stat pl-0">
 						<div class="stat-title">Current level</div>
 						<div class="stat-value">{getLevel(data.profile.xp)}</div>
-						<div class="stat-desc">and {getExtraXp(data.profile.xp)} points</div>
+						<div class="stat-desc">and {getExtraXp(data.profile.xp)} XP</div>
 					</div>
 
 					<div class="stat float-right text-right pr-0">
-						<div class="stat-title">Remaining points</div>
+						<div class="stat-title">Remaining XP</div>
 						<div class="stat-value">{getXpRemaining(data.profile.xp)}</div>
 						<div class="stat-desc">to reach level {getLevel(data.profile.xp) + 1}</div>
 					</div>
