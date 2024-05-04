@@ -7,7 +7,8 @@ export const load: PageLoad = async ({ params }) => {
 		databases.getDocument('main', 'books', params.bookId),
 		databases.listDocuments('main', 'pages', [
 			Query.limit(1000),
-			Query.equal('bookId', params.bookId)
+			Query.equal('bookId', params.bookId),
+			Query.select(['bookId', 'page', 'words', 'ready'])
 		]),
 		databases.listDocuments('main', 'finishes', [
 			Query.limit(1),
