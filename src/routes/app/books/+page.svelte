@@ -239,7 +239,7 @@
 										src={getFilePreview(
 											'pages',
 											`${book.$id}-1`,
-											1280,
+											500,
 											undefined,
 											undefined,
 											undefined,
