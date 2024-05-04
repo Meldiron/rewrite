@@ -7,8 +7,9 @@ Practice typing skills and speed by rewritting books as you read them. Use your 
 - ✅ Leveling system with unlocks
 - ✅ Streaks
 - ✅ Configurable difficulty
-- ⏳ Stats and badges
+- ✅ Stats and Achievements
 - ⏳ Quests and reward shop
+- ⏳ 0 Trust profile stats
 - ⏳ Public leaderboards
 - ⏳ Community events and goals
 
@@ -23,47 +24,29 @@ Practice typing skills and speed by rewritting books as you read them. Use your 
 # 🗒️ Project-specific TODOs
 
 TODO: New payment model
-TODO: Improve post-page modal with stats. Show level progress, streak if relevant, ...
 TODO: Pagination on pages of book
 TODO: Safer way to give back taken tokens if something fails
 TODO: Ability to delete book
 TODO: Screenshot always on
 TODO: Show current user details somewhere
 TODO: Buttons to go back always to go to public lib
-
----
-
-TODO: Badges (with level unlock), monthly too?
-TODO: Quests (with level unlock)
-TODO: Quest points store
-
----
-
 TODO: Top100 books
 TODO: Update SEO stuff
 TODO: Community goals
 TODO: Friend leaderboards
 
 ```markdown
-Levels left: 20, 75?
-
 Quests:
-[100,500,1000] words [without mistake]
-[10,50,100] {5-10}+ character words [without mistake]
-[3,5,10] pages
+[X] words
+- without mistake
+- 5/8/10+ characters long
+- with case sensitivity
+- with accent sensitivity
+- starting with letter [X]
+- with double letter
 
 Shop:
 Restore highest streak
-
-Badges:
-
-- Books/pages/Words
-- words without mistake
-- words of length X
-- WPM (words per minute)
-- use X skips
-- X words with case sentivity
-- X words with accent senstivity
 ```
 
 # 🤖 Auto-generated docs

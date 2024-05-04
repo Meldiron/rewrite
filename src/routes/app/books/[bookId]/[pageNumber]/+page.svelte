@@ -22,6 +22,13 @@
 	let previousPageEl: HTMLDivElement;
 	let inputEl: HTMLInputElement;
 
+	let madeMistake = false;
+
+	let lengthyWords = 0;
+	let noMistakeWords = 0;
+	let accentWords = 0;
+	let caseWords = 0;
+
 	$: data, scrollToBottom();
 	$: data, reloadStats();
 
@@ -188,8 +195,19 @@
 			xp,
 			wordsFinished,
 			pagesFinished,
-			booksFinished
+			booksFinished,
+			lengthyWordsFinished: (data.profile.lengthyWordsFinished ?? 0) + lengthyWords,
+			wordsWithoutMistakeFinished: (data.profile.wordsWithoutMistakeFinished ?? 0) + noMistakeWords,
+			wordsWithAccentSensitivityFinished:
+				(data.profile.wordsWithAccentSensitivityFinished ?? 0) + accentWords,
+			wordsWithCaseSensitivityFinished:
+				(data.profile.wordsWithCaseSensitivityFinished ?? 0) + caseWords
 		});
+
+		lengthyWords = 0;
+		noMistakeWords = 0;
+		accentWords = 0;
+		caseWords = 0;
 
 		await invalidateAll();
 
@@ -235,6 +253,22 @@
 	}
 
 	async function nextWord(target: any) {
+		if (!madeMistake) {
+			noMistakeWords++;
+		}
+
+		if (currentWord.length >= 10) {
+			lengthyWords++;
+		}
+
+		if (data.user?.prefs.caseSensitivity === true) {
+			caseWords++;
+		}
+
+		if (data.user?.prefs.accentSensitivity === true) {
+			accentWords++;
+		}
+
 		target.value = '';
 		correctLetters = 0;
 		wrongLetters = 0;
@@ -299,8 +333,13 @@
 			i++;
 		}
 
+		if (wrongLetters > 0) {
+			madeMistake = true;
+		}
+
 		const lastChar = letters[letters.length - 1];
 		if (lastChar === ' ' && wrongLetters === 1 && correctLetters === currentWord.length) {
+			madeMistake = false;
 			nextWord(target);
 		}
 	}

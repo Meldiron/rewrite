@@ -24,6 +24,117 @@
 	let isSigningOut = false;
 	let isSavingSettings = false;
 
+	// Expected pages per book: 300
+	// Expected words per page: 500
+	const achievements = [
+		{
+			name: 'Typing master',
+			action: 'words rewritten',
+			key: 'wordsFinished',
+			bronze: 50000,
+			silver: 200000,
+			gold: 1000000,
+			diamond: 15000000
+		},
+		{
+			name: 'One day at a time',
+			action: 'days of longest streak',
+			key: 'maxStreak',
+			bronze: 14,
+			silver: 30,
+			gold: 90,
+			diamond: 365
+		},
+		{
+			name: 'Flawless writer',
+			action: 'words without mistake',
+			key: 'wordsWithoutMistakeFinished',
+			bronze: 10000,
+			silver: 50000,
+			gold: 1000000,
+			diamond: 1000000
+		},
+		{
+			name: 'Long story short...',
+			action: 'words rewritten with 10 or more letters',
+			key: 'lengthyWordsFinished',
+			bronze: 10000,
+			silver: 50000,
+			gold: 100000,
+			diamond: 1000000
+		},
+		{
+			name: 'Uppercase knight',
+			action: 'words rewritten with case sensitivity',
+			key: 'wordsWithCaseSensitivityFinished',
+			bronze: 25000,
+			silver: 100000,
+			gold: 500000,
+			diamond: 7500000
+		},
+		{
+			name: 'Perfect spelling',
+			action: 'words rewritten with accent sensitivity',
+			key: 'wordsWithAccentSensitivityFinished',
+			bronze: 25000,
+			silver: 100000,
+			gold: 500000,
+			diamond: 7500000
+		},
+		{
+			name: 'Story teller',
+			action: 'pages finished',
+			key: 'pagesFinished',
+			bronze: 100,
+			silver: 2500,
+			gold: 10000,
+			diamond: 50000
+		},
+		{
+			name: 'Book worm',
+			action: 'books finished',
+			key: 'booksFinished',
+			bronze: 1,
+			silver: 5,
+			gold: 25,
+			diamond: 100
+		}
+	];
+
+	function getAchievementClasses(achievement: (typeof achievements)[number], value: number) {
+		if (value >= achievement.diamond) {
+			return 'bg-info text-info-content';
+		}
+		if (value >= achievement.gold) {
+			return 'bg-warning text-warning-content';
+		}
+		if (value >= achievement.silver) {
+			return 'bg-primary text-primary-content';
+		}
+		if (value >= achievement.bronze) {
+			return 'bg-[#CD7F32] text-base-100';
+		}
+
+		return 'bg-base-300 bg-opacity-50 text-white text-opacity-50';
+	}
+
+	function getGoal(achievement: (typeof achievements)[number], value: number) {
+		if (value >= achievement.diamond) {
+			return achievement.diamond;
+		}
+		if (value >= achievement.gold) {
+			return achievement.diamond;
+		}
+		if (value >= achievement.silver) {
+			return achievement.gold;
+		}
+		if (value >= achievement.bronze) {
+			return achievement.silver;
+		}
+
+		return achievement.bronze;
+	}
+
 	async function signOut() {
 		if (isSigningOut) return;
 
@@ -450,86 +561,47 @@
 							<div class="stat-value text-active">{data.profile.pagesFinished}</div>
 						</div>
 
-						<div class="divider">Badges</div>
+						<div class="divider">Achievements</div>
 
-						<p class="text-center opacity-50">Coming soon...</p>
-
-						<!-- <div class="flex items-center w-full gap-4">
-								<div class="avatar placeholder border-none">
-									<div
-										class="w-16 mask mask-hexagon bg-base-300 bg-opacity-50 text-white text-opacity-50"
-									>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											viewBox="0 0 24 24"
-											fill="currentColor"
-											class="w-6 h-6"
+						<div class="flex flex-col gap-6">
+							{#each achievements as achievement}
+								<div class="flex items-center w-full gap-4">
+									<div class="avatar placeholder border-none">
+										<div
+											class={`${getAchievementClasses(achievement, data.profile[achievement.key] ?? 0)} w-16 mask mask-hexagon`}
 										>
-											<path
-												fill-rule="evenodd"
-												d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 0 0-.584.859 6.753 6.753 0 0 0 6.138 5.6 6.73 6.73 0 0 0 2.743 1.346A6.707 6.707 0 0 1 9.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 0 0-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 0 1-1.112-3.173 6.73 6.73 0 0 0 2.743-1.347 6.753 6.753 0 0 0 6.139-5.6.75.75 0 0 0-.585-.858 47.077 47.077 0 0 0-3.07-.543V2.62a.75.75 0 0 0-.658-.744 49.22 49.22 0 0 0-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 0 0-.657.744Zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 0 1 3.16 5.337a45.6 45.6 0 0 1 2.006-.343v.256Zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 0 1-2.863 3.207 6.72 6.72 0 0 0 .857-3.294Z"
-												clip-rule="evenodd"
-											/>
-										</svg>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												viewBox="0 0 24 24"
+												fill="currentColor"
+												class="w-6 h-6"
+											>
+												<path
+													fill-rule="evenodd"
+													d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 0 0-.584.859 6.753 6.753 0 0 0 6.138 5.6 6.73 6.73 0 0 0 2.743 1.346A6.707 6.707 0 0 1 9.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 0 0-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 0 1-1.112-3.173 6.73 6.73 0 0 0 2.743-1.347 6.753 6.753 0 0 0 6.139-5.6.75.75 0 0 0-.585-.858 47.077 47.077 0 0 0-3.07-.543V2.62a.75.75 0 0 0-.658-.744 49.22 49.22 0 0 0-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 0 0-.657.744Zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 0 1 3.16 5.337a45.6 45.6 0 0 1 2.006-.343v.256Zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 0 1-2.863 3.207 6.72 6.72 0 0 0 .857-3.294Z"
+													clip-rule="evenodd"
+												/>
+											</svg>
+										</div>
+									</div>
+									<div class="w-full">
+										<p class="text-primary text-sm">{achievement.name}</p>
+										<progress
+											class="progress w-56"
+											value={data.profile[achievement.key] ?? 0}
+											max={getGoal(achievement, data.profile[achievement.key] ?? 0)}
+										></progress>
+										<p class="text-xs">
+											{data.profile[achievement.key] ?? 0} / {getGoal(
+												achievement,
+												data.profile[achievement.key] ?? 0
+											)}
+											{achievement.action}
+										</p>
 									</div>
 								</div>
-								<div class="w-full">
-									<p class="text-primary text-sm">Bla bla bla bla</p>
-									<progress class="progress w-56" value="40" max="100"></progress>
-									<p class="text-xs">10 / 55</p>
-								</div>
-							</div>
-
-							<div>
-								<div class="avatar placeholder border-none">
-									<div class="w-16 mask mask-hexagon bg-[#CD7F32] text-base-100">
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											viewBox="0 0 24 24"
-											fill="currentColor"
-											class="w-6 h-6"
-										>
-											<path
-												fill-rule="evenodd"
-												d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 0 0-.584.859 6.753 6.753 0 0 0 6.138 5.6 6.73 6.73 0 0 0 2.743 1.346A6.707 6.707 0 0 1 9.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 0 0-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 0 1-1.112-3.173 6.73 6.73 0 0 0 2.743-1.347 6.753 6.753 0 0 0 6.139-5.6.75.75 0 0 0-.585-.858 47.077 47.077 0 0 0-3.07-.543V2.62a.75.75 0 0 0-.658-.744 49.22 49.22 0 0 0-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 0 0-.657.744Zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 0 1 3.16 5.337a45.6 45.6 0 0 1 2.006-.343v.256Zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 0 1-2.863 3.207 6.72 6.72 0 0 0 .857-3.294Z"
-												clip-rule="evenodd"
-											/>
-										</svg>
-									</div>
-								</div>
-								<div class="avatar placeholder border-none">
-									<div class="w-16 mask mask-hexagon bg-primary text-primary-content">
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											viewBox="0 0 24 24"
-											fill="currentColor"
-											class="w-6 h-6"
-										>
-											<path
-												fill-rule="evenodd"
-												d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 0 0-.584.859 6.753 6.753 0 0 0 6.138 5.6 6.73 6.73 0 0 0 2.743 1.346A6.707 6.707 0 0 1 9.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 0 0-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 0 1-1.112-3.173 6.73 6.73 0 0 0 2.743-1.347 6.753 6.753 0 0 0 6.139-5.6.75.75 0 0 0-.585-.858 47.077 47.077 0 0 0-3.07-.543V2.62a.75.75 0 0 0-.658-.744 49.22 49.22 0 0 0-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 0 0-.657.744Zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 0 1 3.16 5.337a45.6 45.6 0 0 1 2.006-.343v.256Zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 0 1-2.863 3.207 6.72 6.72 0 0 0 .857-3.294Z"
-												clip-rule="evenodd"
-											/>
-										</svg>
-									</div>
-								</div>
-								<div class="avatar placeholder border-none">
-									<div class="w-16 mask mask-hexagon bg-warning text-warning-content gold-badge">
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											viewBox="0 0 24 24"
-											fill="currentColor"
-											class="w-6 h-6"
-										>
-											<path
-												fill-rule="evenodd"
-												d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 0 0-.584.859 6.753 6.753 0 0 0 6.138 5.6 6.73 6.73 0 0 0 2.743 1.346A6.707 6.707 0 0 1 9.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 0 0-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 0 1-1.112-3.173 6.73 6.73 0 0 0 2.743-1.347 6.753 6.753 0 0 0 6.139-5.6.75.75 0 0 0-.585-.858 47.077 47.077 0 0 0-3.07-.543V2.62a.75.75 0 0 0-.658-.744 49.22 49.22 0 0 0-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 0 0-.657.744Zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 0 1 3.16 5.337a45.6 45.6 0 0 1 2.006-.343v.256Zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 0 1-2.863 3.207 6.72 6.72 0 0 0 .857-3.294Z"
-												clip-rule="evenodd"
-											/>
-										</svg>
-									</div>
-								</div>
-							</div> -->
+							{/each}
+						</div>
 					{:else if $profileMenuStore.tab === 'quests'}
 						<p class="text-center opacity-50">Coming soon...</p>
 					{/if}
@@ -547,7 +619,7 @@
 				<h3 class="font-bold text-lg">Streaks</h3>
 				<p class="py-4 text-primary">
 					Rewrite at least one page every day, and increase your streak by one point each time. High
-					streaks show dedication and give profile badges.
+					streaks show dedication and progresses profile achievement.
 				</p>
 
 				<div class="grid grid-cols-7 gap-4 sm:gap-8">

@@ -32,7 +32,10 @@ export const load: LayoutLoad = async () => {
 				booksFinished: 0,
 				coins: 0,
 				currentQuest: null,
-				badges: []
+				wordsWithAccentSensitivityFinished: 0,
+				wordsWithCaseSensitivityFinished: 0,
+				lengthyWordsFinished: 0,
+				wordsWithoutMistakeFinished: 0
 			});
 			const newPrefs = {
 				...user.prefs,
