@@ -21,6 +21,24 @@ Practice typing skills and speed by rewriting books as you read them. Use your o
 
 ![Screenshots](docs/ss4.png)
 
+## 🎓 How to use
+
+All you do is upload a book (or pick one from the public library) and rewrite it, letter by letter. Your goal is to finish the page, finish entire book, or even entire library.
+
+**Main use-cases:**
+
+1. Learning method
+
+Rewriting school materials could help keep focus and ensure 100% correctness when writing Can help in med schools, law schools.. Anything with professional vocabulary.
+
+2. Writing practice
+
+When learning a new language, writing is one of the skills. Rewriting helps to build habit for specific words, and learning to write them correctly. To this day I struggle with words like through, thought...
+
+3. Simply a game
+
+There are a lot of gamification features like quests, achievements, levels... Lovers of RPG can get intrigued, do some micro-learning while entertaining themselves
+
 # 🗒️ Project-specific TODOs
 
 TODO: New payment model
