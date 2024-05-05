@@ -29,7 +29,7 @@
 	const achievements = [
 		{
 			name: 'Typing master',
-			action: 'words rewritten',
+			action: 'words rewriten',
 			key: 'wordsFinished',
 			bronze: 50000,
 			silver: 200000,
@@ -56,7 +56,7 @@
 		},
 		{
 			name: 'Long story short...',
-			action: 'words rewritten with 10 or more letters',
+			action: 'words rewriten with 10 or more letters',
 			key: 'lengthyWordsFinished',
 			bronze: 10000,
 			silver: 50000,
@@ -65,7 +65,7 @@
 		},
 		{
 			name: 'Uppercase knight',
-			action: 'words rewritten with case sensitivity',
+			action: 'words rewriten with case sensitivity',
 			key: 'wordsWithCaseSensitivityFinished',
 			bronze: 25000,
 			silver: 100000,
@@ -74,7 +74,7 @@
 		},
 		{
 			name: 'Perfect spelling',
-			action: 'words rewritten with accent sensitivity',
+			action: 'words rewriten with accent sensitivity',
 			key: 'wordsWithAccentSensitivityFinished',
 			bronze: 25000,
 			silver: 100000,
@@ -516,7 +516,7 @@
 								</svg>
 							</div>
 							<div class="stat-value">{data.profile.booksFinished}</div>
-							<div class="text-active">Books rewritten</div>
+							<div class="text-active">Books rewriten</div>
 						</div>
 
 						<div class="stat">
@@ -536,7 +536,7 @@
 									/>
 								</svg>
 							</div>
-							<div class="stat-title text-primary">Rewritten words</div>
+							<div class="stat-title text-primary">Rewriten words</div>
 							<div class="stat-value text-active">{data.profile.wordsFinished}</div>
 						</div>
 
@@ -557,7 +557,7 @@
 									/>
 								</svg>
 							</div>
-							<div class="stat-title text-primary">Rewritten pages</div>
+							<div class="stat-title text-primary">Rewriten pages</div>
 							<div class="stat-value text-active">{data.profile.pagesFinished}</div>
 						</div>
 
@@ -748,7 +748,7 @@
 			<div class="modal-box">
 				<h3 class="font-bold text-lg">Level</h3>
 				<p class="py-4 text-primary">
-					Earn XP for each rewritten letter and level up. There are rewards at specific level
+					Earn XP for each rewriten letter and level up. There are rewards at specific level
 					minestones.
 				</p>
 

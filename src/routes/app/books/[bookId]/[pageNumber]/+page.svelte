@@ -106,7 +106,7 @@
 
 	async function finishPage() {
 		if (data.isCompleted) {
-			$toastStore = { type: 'info', text: 'You have already rewritten this page.' };
+			$toastStore = { type: 'info', text: 'You have already rewriten this page.' };
 			return;
 		}
 
@@ -426,7 +426,7 @@
 					d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
 				/></svg
 			>
-			<span>You have already rewritten this page.</span>
+			<span>You have already rewriten this page.</span>
 			<a href={`/app/books/${data.book.$id}/${data.page.page + 1}`} class="btn btn-primary"
 				>Next page</a
 			>
@@ -529,7 +529,7 @@
 	>
 		<div class="modal-box">
 			<h3 class="font-bold text-lg">Page complered</h3>
-			<p class="py-4 text-primary">You have successfully rewritten a page and earned rewards.</p>
+			<p class="py-4 text-primary">You have successfully rewriten a page and earned rewards.</p>
 			<div class="flex flex-col gap-4">
 				<div class="flex gap-4 items-center">
 					<kbd class="kbd">{endLevelModalData.xp}</kbd> <span>Base XP</span>

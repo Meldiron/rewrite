@@ -1,6 +1,6 @@
 # 💻 Rewrite\_
 
-Practice typing skills and speed by rewritting books as you read them. Use your own books for learning or entertainment.
+Practice typing skills and speed by rewriting books as you read them. Use your own books for learning or entertainment.
 
 - ✅ Custom .EPUB and PDF files
 - ✅ Public library
@@ -38,6 +38,7 @@ TODO: Friend leaderboards
 ```markdown
 Quests:
 [X] words
+
 - without mistake
 - 5/8/10+ characters long
 - with case sensitivity

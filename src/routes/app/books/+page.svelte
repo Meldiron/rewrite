@@ -419,14 +419,14 @@
 				<div>
 					<h3 class="font-bold">
 						Public library content is provided by <a
-							href="https://www.gutenberg.org/"
+							href="https://english-e-reader.net/"
 							target="_blank"
-							class="underline">Project Gutenberg</a
+							class="underline">English e-Reader</a
 						>
 					</h3>
 					<div class="text-xs">
-						All books are licensed under public domain. For claims, contact me:
-						matejbaco2000@gmail.com
+						If a book needs to be removed for licencing reasons, please contact me:
+						contact@almostapps.eu
 					</div>
 				</div>
 			</div>

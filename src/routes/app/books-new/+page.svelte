@@ -160,7 +160,7 @@
 			<div class="collapse-title text-xl font-medium">What are tokens?</div>
 			<div class="collapse-content">
 				<p class="text-primary">
-					When preparing e-book for rewritting, we use external technologies which are not free. To
+					When preparing e-book for rewriting, we use external technologies which are not free. To
 					cover the costs, we use tokens. Each token allows you to upload 1 e-book.
 				</p>
 			</div>
@@ -222,7 +222,7 @@
 					Our goal with tokens isn't to make a profit, instead, to cover expenses to keep Rewrite
 					running. If your situation doesn't allow you to purchase tokens and you are vividly
 					looking forward using Rewrite with your own books, please contact me at
-					matejbaco2000@gmail.com. We are open to making exceptions.
+					contact@almostapps.eu. We are open to making exceptions.
 				</p>
 			</div>
 		</div>
