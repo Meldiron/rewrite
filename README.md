@@ -9,8 +9,8 @@ Practice typing skills and speed by rewriting books as you read them. Use your o
 - ✅ Configurable difficulty
 - ✅ Stats and Achievements
 - ⏳ Quests and reward shop
-- ⏳ 0 Trust profile stats
-- ⏳ Public leaderboards
+- ⏳ 0 Trust server validation
+- ⏳ Public and friends leaderboards
 - ⏳ Community events and goals
 
 ![Screenshots](docs/ss1.png)
@@ -41,31 +41,23 @@ There are a lot of gamification features like quests, achievements, levels... Lo
 
 # 🗒️ Project-specific TODOs
 
-TODO: New payment model
+TODO: New payment model (pay per page)
 TODO: Pagination on pages of book
-TODO: Safer way to give back taken tokens if something fails
+TODO: Safer way to give back taken tokens if something fails. And only process if enough tokens after initial convert to PNGs
 TODO: Ability to delete book
 TODO: Screenshot always on
 TODO: Show current user details somewhere
 TODO: Buttons to go back always to go to public lib
-TODO: Top100 books
+TODO: More public books
 TODO: Update SEO stuff
 TODO: Community goals
 TODO: Friend leaderboards
 
 ```markdown
-Quests:
-[X] words
-
-- without mistake
-- 5/8/10+ characters long
-- with case sensitivity
-- with accent sensitivity
-- starting with letter [X]
-- with double letter
-
 Shop:
-Restore highest streak
+Restore highest streak (15 coins)
+Double XP for 1 hour (5 coins)
+10x Auto-mistake-skip (3 coins)
 ```
 
 # 🤖 Auto-generated docs

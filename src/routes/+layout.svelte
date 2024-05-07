@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto, invalidate, invalidateAll } from '$app/navigation';
-	import { account } from '$lib/appwrite';
+	import { account, databases } from '$lib/appwrite';
 	import {
 		leftMenuStore,
 		levelModalStore,
@@ -23,6 +23,89 @@
 
 	let isSigningOut = false;
 	let isSavingSettings = false;
+
+	$: data, setCurrentQuest();
+
+	let currentQuest: any = null;
+	function setCurrentQuest() {
+		try {
+			currentQuest = JSON.parse(data.profile.currentQuest);
+		} catch (err) {
+			currentQuest = null;
+		}
+	}
+
+	const types = ['starts', 'ends', 'contains', 'length'];
+	const difficulties = ['easy', 'medium', 'hard'];
+	const letters = [
+		'a',
+		'e',
+		'i',
+		'o',
+		'u',
+		'r',
+		't',
+		'n',
+		's',
+		'l',
+		'c',
+		'd',
+		'p',
+		'm',
+		'h',
+		'g',
+		'b'
+	];
+	function getRandomQuest() {
+		const difficulty = difficulties[Math.floor(Math.random() * difficulties.length)];
+		const type = types[Math.floor(Math.random() * types.length)];
+
+		let amount = 0;
+		let details = '';
+		let message = '';
+
+		if (type === 'starts' || type === 'ends') {
+			amount = 10;
+			details = letters[Math.floor(Math.random() * letters.length)];
+			message = `Rewrite {{AMOUNT}} words that ${type} with the letter '${details}'`;
+		}
+
+		if (type === 'contains') {
+			amount = 100;
+			details = letters[Math.floor(Math.random() * letters.length)];
+			message = `Rewrite {{AMOUNT}} words containing the letter ${details}`;
+		}
+
+		if (type === 'length') {
+			const counts = [6, 8, 10];
+			details = counts[Math.floor(Math.random() * counts.length)].toString();
+
+			if (details === '6') {
+				amount = 100;
+			} else if (details === '8') {
+				amount = 30;
+			} else if (details === '10') {
+				amount = 10;
+			}
+
+			message = `Rewrite {{AMOUNT}} words that are ${details} or more letters long`;
+		}
+
+		const difficultyBase = difficulty === 'easy' ? 1 : difficulty === 'medium' ? 3 : 5;
+
+		amount = amount * difficultyBase;
+
+		return {
+			difficulty,
+			type,
+			details,
+			amount,
+			reward: difficultyBase,
+			message: message.split('{{AMOUNT}}').join(amount.toString())
+		};
+	}
+
+	let suggestedQuest = getRandomQuest();
 
 	// Expected pages per book: 300
 	// Expected words per page: 500
@@ -213,6 +296,29 @@
 			throw error;
 		} finally {
 			isSavingSettings = false;
+		}
+	}
+
+	let isAccepting = false;
+	async function onAcceptQuest() {
+		if (isAccepting) {
+			return;
+		}
+
+		isAccepting = true;
+
+		try {
+			await databases.updateDocument('main', 'profiles', data.profile.$id, {
+				currentQuest: JSON.stringify({
+					...suggestedQuest,
+					progress: 0
+				})
+			});
+			await invalidateAll();
+		} catch (error) {
+			throw error;
+		} finally {
+			isAccepting = false;
 		}
 	}
 </script>
@@ -603,7 +709,94 @@
 							{/each}
 						</div>
 					{:else if $profileMenuStore.tab === 'quests'}
-						<p class="text-center opacity-50">Coming soon...</p>
+						{#if !currentQuest}
+							<div class="card shadow-lg card-compact bg-base-100">
+								<div class="card-body">
+									<div class="badge badge-outline mb-1">
+										{suggestedQuest.difficulty === 'easy'
+											? 'Easy'
+											: suggestedQuest.difficulty === 'medium'
+												? 'Medium'
+												: 'Hard'}
+									</div>
+
+									<p class=" text-base px-1 tracking-tight text-white">
+										<span class="font-semibold text-base-content">Objective:</span>
+										{suggestedQuest.message}
+									</p>
+									<p class=" text-base px-1 tracking-tight text-white">
+										<span class="font-semibold text-base-content">Reward:</span>
+										{suggestedQuest.reward}
+										{suggestedQuest.reward === 1 ? 'Coin' : 'Coins'}
+									</p>
+
+									<div class="flex items-center justify-between gap-4 w-full">
+										<button
+											on:click={() => (suggestedQuest = getRandomQuest())}
+											class="btn btn-sm btn-ghost flex-0"
+										>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke-width="1.5"
+												stroke="currentColor"
+												class="w-6 h-6"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3"
+												/>
+											</svg>
+										</button>
+										<button on:click={onAcceptQuest} disabled={isAccepting} class="btn btn-sm grow"
+											>Accept</button
+										>
+									</div>
+								</div>
+							</div>
+						{:else}
+							<div class="card shadow-lg card-compact bg-base-100">
+								<div class="card-body">
+									<div class="badge badge-outline mb-1">
+										{currentQuest.difficulty === 'easy'
+											? 'Easy'
+											: currentQuest.difficulty === 'medium'
+												? 'Medium'
+												: 'Hard'}
+									</div>
+
+									<p class=" text-base px-1 tracking-tight text-white">
+										<span class="font-semibold text-base-content">Objective:</span>
+										{currentQuest.message}
+									</p>
+									<p class=" text-base px-1 tracking-tight text-white">
+										<span class="font-semibold text-base-content">Reward:</span>
+										{currentQuest.reward}
+										{currentQuest.reward === 1 ? 'Coin' : 'Coins'}
+									</p>
+
+									<div class="w-full">
+										<progress
+											class="progress w-full"
+											value={currentQuest.progress}
+											max={currentQuest.amount}
+										></progress>
+										<p class="text-xs">
+											{currentQuest.progress} / {currentQuest.amount}
+											words rewriten
+										</p>
+									</div>
+								</div>
+							</div>
+						{/if}
+
+						<div class="divider">Shop</div>
+						<p class="text-center">Coming soon</p>
+						<p class="text-xs text-white opacity-25 text-center">
+							You have {data.profile.coins} coins
+						</p>
 					{/if}
 				</div>
 			</div>

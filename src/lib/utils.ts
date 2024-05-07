@@ -32,8 +32,6 @@ export function hasStreakOnDate(lastStreakDate: string | null, streak: number, d
 
 	const maxAllowedNumber = hasToday ? streak - 1 : streak;
 
-	console.log(maxAllowedNumber);
-
 	return daysDiff <= maxAllowedNumber;
 }
 

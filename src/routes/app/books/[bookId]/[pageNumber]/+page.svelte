@@ -36,7 +36,6 @@
 		setTimeout(() => {
 			if (previousPageEl) {
 				previousPageEl.scrollTop = previousPageEl.scrollHeight;
-				console.log('Scrolled');
 			}
 		}, 1);
 	}
@@ -68,9 +67,11 @@
 	let activeWord = 0;
 	let correctLetters = 0;
 	let wrongLetters = 0;
+	let goldenWords: string[] = [];
 	reloadStats();
 
 	function reloadStats() {
+		goldenWords = [];
 		correctLetters = 0;
 		wrongLetters = 0;
 
@@ -163,6 +164,20 @@
 		endLevelModalData.accentXp = xpToAddAccent;
 		endLevelModalData.caseXp = xpToAddCase;
 
+		let currentQuest = data.profile.currentQuest;
+		let coins = data.profile.coins;
+
+		try {
+			const currentQuestJson = JSON.parse(data.profile.currentQuest);
+			currentQuestJson.progress += goldenWords.length;
+			if (currentQuestJson.progress >= currentQuestJson.amount) {
+				currentQuest = '';
+				coins += currentQuestJson.reward;
+			} else {
+				currentQuest = JSON.stringify(currentQuestJson);
+			}
+		} catch (err) {}
+
 		isSavingProgress = true;
 
 		const finishes = await databases.listDocuments('main', 'finishes', [
@@ -193,6 +208,8 @@
 			totalStreak,
 			maxStreak,
 			xp,
+			currentQuest,
+			coins,
 			wordsFinished,
 			pagesFinished,
 			booksFinished,
@@ -392,6 +409,66 @@
 
 		nextWord(inputEl);
 	}
+
+	function isQuestWord(word: string, index: string) {
+		try {
+			const currentQuest = JSON.parse(data.profile.currentQuest);
+
+			if (currentQuest.type === 'length') {
+				return word.length >= +currentQuest.details;
+			}
+
+			const correctLetter = latinize(currentQuest.details).toLowerCase();
+
+			if (currentQuest.type === 'contains') {
+				for (let letter of word.split('')) {
+					letter = latinize(letter).toLowerCase();
+
+					if (letter === correctLetter) {
+						if (!goldenWords.includes(index)) {
+							goldenWords.push(index);
+						}
+
+						return true;
+					}
+				}
+			}
+
+			if (currentQuest.type === 'starts') {
+				let letter = getWordSimplified(word).split('')[0] ?? '';
+				letter = latinize(letter).toLowerCase();
+				if (letter === correctLetter) {
+					if (!goldenWords.includes(index)) {
+						goldenWords.push(index);
+					}
+
+					return true;
+				}
+			}
+
+			if (currentQuest.type === 'starts') {
+				let letter = getWordSimplified(word).split('')[word.length - 1] ?? '';
+				letter = latinize(letter).toLowerCase();
+				if (letter === correctLetter) {
+					if (!goldenWords.includes(index)) {
+						goldenWords.push(index);
+					}
+
+					return true;
+				}
+			}
+
+			return false;
+		} catch (err) {
+			return false;
+		}
+	}
+
+	function getWordSimplified(word: string) {
+		const pattern = /^[0-9a-zA-Z]*$/g;
+		const found = word.match(pattern) ?? [];
+		return found.join('');
+	}
 </script>
 
 <div class="max-w-2xl mx-auto">
@@ -477,6 +554,8 @@
 				{#each words as word, wordIndex}
 					{@const isActiveLine = activeLine === lineIndex}
 					{@const isActiveWord = isActiveLine && activeWord === wordIndex}
+					{@const index = lineIndex + '-' + wordIndex}
+					{@const isGolden = isQuestWord(word, index)}
 					<span>
 						{#each word.split('') as letter, letterIndex}
 							{@const isGreen =
@@ -485,7 +564,7 @@
 								(isActiveLine && activeWord > wordIndex)}
 							{@const isRed = isActiveWord && letterIndex < correctLetters + wrongLetters}
 							<span
-								class={`${isActiveWord ? 'underline' : ''} ${isGreen ? 'text-success' : ''} ${isRed ? 'text-error' : ''}`}
+								class={`${isActiveWord ? 'underline' : ''} ${!isGreen && !isRed && isGolden ? 'text-base-content' : ''} ${isGreen ? 'text-success' : ''} ${isRed ? 'text-error' : ''}`}
 								>{letter}</span
 							>
 						{/each}

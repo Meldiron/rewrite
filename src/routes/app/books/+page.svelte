@@ -203,7 +203,7 @@
 					>
 					<span class="text-info"
 						><b class="font-semibold">{book.title}</b> is being processed. Please wait. It usually takes
-						5 minutes per 100 pages of e-book.</span
+						1 minutes per 50 pages of e-book.</span
 					>
 				</div>
 			{:else}
