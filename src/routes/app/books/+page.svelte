@@ -5,7 +5,7 @@
 	import { Query } from 'appwrite';
 	import type { PageData } from './$types';
 	import debounce from 'lodash/debounce';
-	import { getLevel } from '$lib/utils';
+	import { formatNumber, getLevel } from '$lib/utils';
 
 	export let data: PageData;
 
@@ -125,8 +125,8 @@
 			edittingId = '';
 
 			await invalidateAll();
-		} catch (error) {
-			throw error;
+		} catch (err: any) {
+			$toastStore = err.message || err || 'An error occurred';
 		} finally {
 			edittingSubitting = false;
 		}
@@ -258,7 +258,7 @@
 						</figure>
 						<div class="card-body">
 							<p class="text-content font-light text-xs uppercase -mt-2 tracking-widest">
-								{getFinishes(book.$id)} / {book.pages}
+								{formatNumber(getFinishes(book.$id))} / {formatNumber(book.pages)}
 							</p>
 							<progress class="progress w-full mb-2" value={getFinishes(book.$id)} max={book.pages}
 							></progress>
@@ -385,7 +385,7 @@
 								{#if getFinishes(book.$id) !== book.pages}
 									<a
 										href={`/app/books/${book.$id}/${getNextPage(book.$id)}`}
-										class="btn btn-primary">Open page {getNextPage(book.$id)}</a
+										class="btn btn-primary">Open page {formatNumber(getNextPage(book.$id))}</a
 									>
 								{/if}
 							</div>

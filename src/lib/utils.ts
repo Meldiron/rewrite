@@ -106,3 +106,8 @@ export function getExtraXp(xp: number) {
 
 	return extraXp;
 }
+
+export function formatNumber(number: number) {
+	// Separate thousands and millions with spaces
+	return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+}

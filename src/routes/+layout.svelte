@@ -9,6 +9,7 @@
 		toastStore
 	} from '$lib/stores';
 	import {
+		formatNumber,
 		getExtraXp,
 		getLevel,
 		getLevelProgress,
@@ -30,7 +31,8 @@
 	function setCurrentQuest() {
 		try {
 			currentQuest = JSON.parse(data.profile.currentQuest);
-		} catch (err) {
+		} catch (err: any) {
+			$toastStore = err.message || err || 'An error occurred';
 			currentQuest = null;
 		}
 	}
@@ -73,7 +75,7 @@
 		if (type === 'contains') {
 			amount = 100;
 			details = letters[Math.floor(Math.random() * letters.length)];
-			message = `Rewrite {{AMOUNT}} words containing the letter ${details}`;
+			message = `Rewrite {{AMOUNT}} words containing the letter '${details}'`;
 		}
 
 		if (type === 'length') {
@@ -273,8 +275,8 @@
 			prefs.accentSensitivity = e.target.checked;
 			await account.updatePrefs(prefs);
 			await invalidateAll();
-		} catch (error) {
-			throw error;
+		} catch (err: any) {
+			$toastStore = err.message || err || 'An error occurred';
 		} finally {
 			isSavingSettings = false;
 		}
@@ -292,8 +294,8 @@
 			prefs.caseSensitivity = e.target.checked;
 			await account.updatePrefs(prefs);
 			await invalidateAll();
-		} catch (error) {
-			throw error;
+		} catch (err: any) {
+			$toastStore = err.message || err || 'An error occurred';
 		} finally {
 			isSavingSettings = false;
 		}
@@ -315,10 +317,88 @@
 				})
 			});
 			await invalidateAll();
-		} catch (error) {
-			throw error;
+		} catch (err: any) {
+			$toastStore = err.message || err || 'An error occurred';
 		} finally {
 			isAccepting = false;
+		}
+	}
+
+	let isBuying = false;
+	async function onBuyRestoreStreak() {
+		if (isBuying) {
+			return;
+		}
+
+		if (data.profile.coins < 15) {
+			$toastStore = 'Not enough coins.';
+			return;
+		}
+
+		isBuying = true;
+
+		try {
+			await databases.updateDocument('main', 'profiles', data.profile.$id, {
+				coins: data.profile.coins - 15,
+				streak: data.profile.maxStreak,
+				lastStreakDate: new Date().toISOString()
+			});
+			await invalidateAll();
+		} catch (err: any) {
+			$toastStore = err.message || err || 'An error occurred';
+		} finally {
+			isBuying = false;
+		}
+	}
+	async function onBuyAutocorrects() {
+		if (isBuying) {
+			return;
+		}
+
+		if (data.profile.coins < 3) {
+			$toastStore = 'Not enough coins.';
+			return;
+		}
+
+		isBuying = true;
+
+		try {
+			await databases.updateDocument('main', 'profiles', data.profile.$id, {
+				coins: data.profile.coins - 3,
+				autocorrects: data.profile.autocorrects + 10
+			});
+			await invalidateAll();
+		} catch (err: any) {
+			$toastStore = err.message || err || 'An error occurred';
+		} finally {
+			isBuying = false;
+		}
+	}
+	async function onBuyDoubleXp() {
+		if (isBuying) {
+			return;
+		}
+
+		if (data.profile.coins < 5) {
+			$toastStore = 'Not enough coins.';
+			return;
+		}
+
+		isBuying = true;
+
+		const dateUntil = new Date();
+		dateUntil.setHours(dateUntil.getHours() + 1);
+
+		try {
+			await databases.updateDocument('main', 'profiles', data.profile.$id, {
+				coins: data.profile.coins - 5,
+				doubleXpUntilDate: dateUntil.toISOString()
+			});
+			await invalidateAll();
+		} catch (err: any) {
+			$toastStore = err.message || err || 'An error occurred';
+		} finally {
+			isBuying = false;
 		}
 	}
 </script>
@@ -621,7 +701,7 @@
 									/>
 								</svg>
 							</div>
-							<div class="stat-value">{data.profile.booksFinished}</div>
+							<div class="stat-value">{formatNumber(data.profile.booksFinished)}</div>
 							<div class="text-active">Books rewriten</div>
 						</div>
 
@@ -643,7 +723,7 @@
 								</svg>
 							</div>
 							<div class="stat-title text-primary">Rewriten words</div>
-							<div class="stat-value text-active">{data.profile.wordsFinished}</div>
+							<div class="stat-value text-active">{formatNumber(data.profile.wordsFinished)}</div>
 						</div>
 
 						<div class="stat">
@@ -664,7 +744,7 @@
 								</svg>
 							</div>
 							<div class="stat-title text-primary">Rewriten pages</div>
-							<div class="stat-value text-active">{data.profile.pagesFinished}</div>
+							<div class="stat-value text-active">{formatNumber(data.profile.pagesFinished)}</div>
 						</div>
 
 						<div class="divider">Achievements</div>
@@ -698,9 +778,8 @@
 											max={getGoal(achievement, data.profile[achievement.key] ?? 0)}
 										></progress>
 										<p class="text-xs">
-											{data.profile[achievement.key] ?? 0} / {getGoal(
-												achievement,
-												data.profile[achievement.key] ?? 0
+											{formatNumber(data.profile[achievement.key] ?? 0)} / {formatNumber(
+												getGoal(achievement, data.profile[achievement.key] ?? 0)
 											)}
 											{achievement.action}
 										</p>
@@ -709,6 +788,25 @@
 							{/each}
 						</div>
 					{:else if $profileMenuStore.tab === 'quests'}
+						<div role="alert" class="alert bg-base-100 mb-4">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								class="stroke-info shrink-0 w-6 h-6"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+								></path></svg
+							>
+							<span
+								>You have {formatNumber(data.profile.coins)}
+								{data.profile.coins === 1 ? 'coin' : 'coins'}.</span
+							>
+						</div>
+
 						{#if !currentQuest}
 							<div class="card shadow-lg card-compact bg-base-100">
 								<div class="card-body">
@@ -793,10 +891,130 @@
 						{/if}
 
 						<div class="divider">Shop</div>
-						<p class="text-center">Coming soon</p>
-						<p class="text-xs text-white opacity-25 text-center">
-							You have {data.profile.coins} coins
-						</p>
+
+						<div class="flex flex-col gap-2">
+							<div class="card card-compact bg-base-100 shadow-xl">
+								<figure>
+									<div class="aspect-[28/9] w-full bg-base-300 flex items-center justify-center">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+											class="w-10 h-10"
+										>
+											<path
+												d="M12 .75a8.25 8.25 0 0 0-4.135 15.39c.686.398 1.115 1.008 1.134 1.623a.75.75 0 0 0 .577.706c.352.083.71.148 1.074.195.323.041.6-.218.6-.544v-4.661a6.714 6.714 0 0 1-.937-.171.75.75 0 1 1 .374-1.453 5.261 5.261 0 0 0 2.626 0 .75.75 0 1 1 .374 1.452 6.712 6.712 0 0 1-.937.172v4.66c0 .327.277.586.6.545.364-.047.722-.112 1.074-.195a.75.75 0 0 0 .577-.706c.02-.615.448-1.225 1.134-1.623A8.25 8.25 0 0 0 12 .75Z"
+											/>
+											<path
+												fill-rule="evenodd"
+												d="M9.013 19.9a.75.75 0 0 1 .877-.597 11.319 11.319 0 0 0 4.22 0 .75.75 0 1 1 .28 1.473 12.819 12.819 0 0 1-4.78 0 .75.75 0 0 1-.597-.876ZM9.754 22.344a.75.75 0 0 1 .824-.668 13.682 13.682 0 0 0 2.844 0 .75.75 0 1 1 .156 1.492 15.156 15.156 0 0 1-3.156 0 .75.75 0 0 1-.668-.824Z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</div>
+								</figure>
+								<div class="card-body">
+									<h2 class="card-title text-primary">10x Autocorrect</h2>
+									<p>
+										Gives 10 uses of autocorrect. This is passive feature that automatically
+										corrects your mistake when rewriting.
+									</p>
+									<div class="card-actions justify-end mt-2">
+										<button
+											disabled={isBuying}
+											on:click={onBuyAutocorrects}
+											class="btn btn-sm btn-block btn-outline font-medium">Buy for 3 coins</button
+										>
+
+										<p class="text-sm text-center text-white opacity-75">
+											You have {data.profile.autocorrects}
+											{data.profile.autocorrects === 1 ? 'autocorrect' : 'autocorrects'} now.
+										</p>
+									</div>
+								</div>
+							</div>
+
+							<div class="divider"></div>
+
+							<div class="card card-compact bg-base-100 shadow-xl">
+								<figure>
+									<div class="aspect-[28/9] w-full bg-base-300 flex items-center justify-center">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+											class="w-10 h-10"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M12.963 2.286a.75.75 0 0 0-1.071-.136 9.742 9.742 0 0 0-3.539 6.176 7.547 7.547 0 0 1-1.705-1.715.75.75 0 0 0-1.152-.082A9 9 0 1 0 15.68 4.534a7.46 7.46 0 0 1-2.717-2.248ZM15.75 14.25a3.75 3.75 0 1 1-7.313-1.172c.628.465 1.35.81 2.133 1a5.99 5.99 0 0 1 1.925-3.546 3.75 3.75 0 0 1 3.255 3.718Z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</div>
+								</figure>
+								<div class="card-body">
+									<h2 class="card-title text-primary">Restore highest streak</h2>
+									<p>Mark your current streak to amount of your longest streak.</p>
+									{#if data.profile.streak < data.profile.maxStreak}
+										<div class="card-actions justify-end mt-2">
+											<button
+												disabled={isBuying}
+												on:click={onBuyRestoreStreak}
+												class="btn btn-sm btn-block btn-outline font-medium"
+												>Buy for 15 coins</button
+											>
+										</div>
+									{:else}
+										<button class="btn-active mt-3 btn-block btn-sm btn btn-ghost"
+											>You already have highest streak.</button
+										>
+									{/if}
+								</div>
+							</div>
+
+							<div class="divider"></div>
+							<div class="card card-compact bg-base-100 shadow-xl">
+								<figure>
+									<div class="aspect-[28/9] w-full bg-base-300 flex items-center justify-center">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+											class="w-10 h-10"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</div>
+								</figure>
+								<div class="card-body">
+									<h2 class="card-title text-primary">Double XP for 1 hour</h2>
+									<p>Doubles all XP earned after rewriting a page for next 60 minutes.</p>
+
+									{#if !data.profile.doubleXpUntilDate || Date.now() > new Date(data.profile.doubleXpUntilDate).getTime()}
+										<div class="card-actions justify-end mt-2">
+											<button
+												disabled={isBuying}
+												on:click={onBuyDoubleXp}
+												class="btn btn-sm btn-block btn-outline font-medium">Buy for 5 coins</button
+											>
+										</div>
+									{:else}
+										<button class="btn-active mt-3 btn-block btn-sm btn btn-ghost"
+											>Already active for {Math.ceil(
+												(new Date(data.profile.doubleXpUntilDate).getTime() - Date.now()) /
+													1000 /
+													60
+											)} more mins.</button
+										>
+									{/if}
+								</div>
+							</div>
+						</div>
 					{/if}
 				</div>
 			</div>

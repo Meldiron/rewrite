@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { formatNumber } from '$lib/utils';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
@@ -47,7 +48,7 @@
 	></progress>
 
 	<p class="text-content font-light text-xs uppercase tracking-widest text-center mb-6">
-		Completed {data.finishedPageNumbers.length} / {data.pages.total} pages
+		Completed {formatNumber(data.finishedPageNumbers.length)} / {formatNumber(data.pages.total)} pages
 	</p>
 
 	<div class="divider"></div>
@@ -91,7 +92,7 @@
 						d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"
 					/>
 				</svg>
-				Continue page {nextPage}
+				Continue page {formatNumber(nextPage)}
 			</a>
 		{/if}
 		<div class="form-control">
@@ -134,8 +135,9 @@
 					<tbody>
 						{#each tableDocuments as page}
 							<tr>
-								<th class="font-bold">{page.page}</th>
-								<td>{page.words ?? 0} words</td>
+								<th class="font-bold">{formatNumber(page.page)}</th>
+								<td>{formatNumber(page.words ?? 0)} {(page.words ?? 0) === 1 ? 'word' : 'words'}</td
+								>
 								<td>
 									{#if data.finishedPageNumbers.includes(page.page)}
 										<div class="badge">Yes</div>

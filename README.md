@@ -8,7 +8,7 @@ Practice typing skills and speed by rewriting books as you read them. Use your o
 - ✅ Streaks
 - ✅ Configurable difficulty
 - ✅ Stats and Achievements
-- ⏳ Quests and reward shop
+- ✅ Quests and reward shop
 - ⏳ 0 Trust server validation
 - ⏳ Public and friends leaderboards
 - ⏳ Community events and goals
@@ -45,20 +45,11 @@ TODO: New payment model (pay per page)
 TODO: Pagination on pages of book
 TODO: Safer way to give back taken tokens if something fails. And only process if enough tokens after initial convert to PNGs
 TODO: Ability to delete book
-TODO: Screenshot always on
+TODO: Screenshot always on?
 TODO: Show current user details somewhere
 TODO: Buttons to go back always to go to public lib
 TODO: More public books
 TODO: Update SEO stuff
-TODO: Community goals
-TODO: Friend leaderboards
-
-```markdown
-Shop:
-Restore highest streak (15 coins)
-Double XP for 1 hour (5 coins)
-10x Auto-mistake-skip (3 coins)
-```
 
 # 🤖 Auto-generated docs
 

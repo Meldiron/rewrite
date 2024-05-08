@@ -5,7 +5,14 @@
 	import type { PageData } from './$types';
 	import { invalidateAll } from '$app/navigation';
 	import { latinize } from '$lib/latinize';
-	import { getLevel, getLevelProgress, getXpRemaining, hasStreak, isStreakEnded } from '$lib/utils';
+	import {
+		formatNumber,
+		getLevel,
+		getLevelProgress,
+		getXpRemaining,
+		hasStreak,
+		isStreakEnded
+	} from '$lib/utils';
 	import { onMount } from 'svelte';
 
 	export let data: PageData;
@@ -15,7 +22,8 @@
 	let endLevelModalData = {
 		xp: 0,
 		accentXp: 0,
-		caseXp: 0
+		caseXp: 0,
+		doubleXp: 0
 	};
 
 	let currentMainTab: 'text' | 'screenshot' = 'text';
@@ -24,6 +32,7 @@
 
 	let madeMistake = false;
 
+	let activeAutocorrects = 0;
 	let lengthyWords = 0;
 	let noMistakeWords = 0;
 	let accentWords = 0;
@@ -31,6 +40,11 @@
 
 	$: data, scrollToBottom();
 	$: data, reloadStats();
+	$: data, setActiveAutocorrects();
+
+	function setActiveAutocorrects() {
+		activeAutocorrects = data.profile.autocorrects;
+	}
 
 	function scrollToBottom() {
 		setTimeout(() => {
@@ -136,10 +150,20 @@
 		const xpToAddCase =
 			data.user?.prefs.caseSensitivity === true ? Math.floor(xpToAddBase * 0.1) : 0;
 
+		let xpToAddDouble = 0;
+
+		if (
+			data.profile.doubleXpUntilDate &&
+			Date.now() <= new Date(data.profile.doubleXpUntilDate).getTime()
+		) {
+			xpToAddDouble = xpToAddBase;
+		}
+
 		let xp = data.profile.xp ?? 0;
 		xp += xpToAddBase;
 		xp += xpToAddAccent;
 		xp += xpToAddCase;
+		xp += xpToAddDouble;
 
 		let wordsFinished = data.profile.wordsFinished ?? 0;
 		wordsFinished += wordsToAdd;
@@ -163,6 +187,7 @@
 		endLevelModalData.xp = xpToAddBase;
 		endLevelModalData.accentXp = xpToAddAccent;
 		endLevelModalData.caseXp = xpToAddCase;
+		endLevelModalData.doubleXp = xpToAddDouble;
 
 		let currentQuest = data.profile.currentQuest;
 		let coins = data.profile.coins;
@@ -290,7 +315,11 @@
 		correctLetters = 0;
 		wrongLetters = 0;
 
+		console.log(activeWord);
+
 		activeWord++;
+
+		console.log(activeWord);
 
 		if (activeWord >= linesOfWords[activeLine].length) {
 			activeWord = 0;
@@ -355,9 +384,20 @@
 		}
 
 		const lastChar = letters[letters.length - 1];
-		if (lastChar === ' ' && wrongLetters === 1 && correctLetters === currentWord.length) {
-			madeMistake = false;
-			nextWord(target);
+
+		if (lastChar === ' ') {
+			if (wrongLetters === 1 && correctLetters === currentWord.length) {
+				madeMistake = false;
+				nextWord(target);
+			} else if (activeAutocorrects > 0) {
+				activeAutocorrects--;
+				databases.updateDocument('main', 'profiles', data.profile.$id, {
+					autocorrects: activeAutocorrects
+				});
+
+				madeMistake = false;
+				nextWord(target);
+			}
 		}
 	}
 
@@ -481,7 +521,7 @@
 			href={`/app/books/${data.book.$id}/${data.page.page - 1}`}
 			class="btn btn-xs btn-active btn-ghost">Back</a
 		>
-		Page {data.page.page} / {data.totalPages}
+		Page {formatNumber(data.page.page)} / {formatNumber(data.totalPages)}
 
 		<a
 			href={`/app/books/${data.book.$id}/${data.page.page + 1}`}
@@ -575,30 +615,39 @@
 	</div>
 </div>
 
-<div
-	class="fixed bottom-0 p-6 left-0 w-full rounded-t-xl flex gap-4 justify-center backdrop-blur-md bg-black bg-opacity-25"
->
-	<input
-		bind:this={inputEl}
-		on:keydown={onKeyDown}
-		on:input={onChange}
-		type="text"
-		autofocus={true}
-		placeholder="Type here"
-		class="input input-lg border-3 input-bordered w-full"
-	/>
-
+<div class="fixed bottom-0 left-0 w-full">
 	<button
-		disabled={!canSkip}
-		on:click={onSkipWord}
-		class={`btn btn-lg btn-ghost btn-active text-sm ${canSkip ? '' : '!text-white !text-opacity-60'}`}
+		class={`btn border-none text-sm rounded-none rounded-tr-xl backdrop-blur-md bg-black bg-opacity-50`}
 	>
-		{#if canSkip}
-			Skip word
-		{:else}
-			Wait {secondsLeft} {secondsLeft === 1 ? 'second' : 'seconds'}
-		{/if}
+		{activeAutocorrects}
+		{activeAutocorrects === 1 ? 'Autocorrect' : 'Autocorrects'}
 	</button>
+
+	<div
+		class="flex gap-4 justify-center w-full p-6 rounded-tr-xl backdrop-blur-md bg-black bg-opacity-50"
+	>
+		<input
+			bind:this={inputEl}
+			on:keydown={onKeyDown}
+			on:input={onChange}
+			type="text"
+			autofocus={true}
+			placeholder="Type here"
+			class="input input-lg border-3 input-bordered w-full"
+		/>
+
+		<button
+			disabled={!canSkip}
+			on:click={onSkipWord}
+			class={`btn btn-lg btn-ghost btn-active text-sm ${canSkip ? '' : '!text-white !text-opacity-60'}`}
+		>
+			{#if canSkip}
+				Skip word
+			{:else}
+				Wait {secondsLeft} {secondsLeft === 1 ? 'second' : 'seconds'}
+			{/if}
+		</button>
+	</div>
 </div>
 
 {#if endLevelModalOpened}
@@ -611,13 +660,19 @@
 			<p class="py-4 text-primary">You have successfully rewriten a page and earned rewards.</p>
 			<div class="flex flex-col gap-4">
 				<div class="flex gap-4 items-center">
-					<kbd class="kbd">{endLevelModalData.xp}</kbd> <span>Base XP</span>
+					<kbd class="kbd">{formatNumber(endLevelModalData.xp)}</kbd> <span>Base XP</span>
+				</div>
+				{#if endLevelModalData.doubleXp && endLevelModalData.doubleXp > 0}
+					<div class="flex gap-4 items-center">
+						<kbd class="kbd">{formatNumber(endLevelModalData.doubleXp)}</kbd> <span>Double XP</span>
+					</div>
+				{/if}
+				<div class="flex gap-4 items-center">
+					<kbd class="kbd">{formatNumber(endLevelModalData.caseXp)}</kbd>
+					<span>Bonus for case sensitivity</span>
 				</div>
 				<div class="flex gap-4 items-center">
-					<kbd class="kbd">{endLevelModalData.caseXp}</kbd> <span>Bonus for case sensitivity</span>
-				</div>
-				<div class="flex gap-4 items-center">
-					<kbd class="kbd">{endLevelModalData.accentXp}</kbd>
+					<kbd class="kbd">{formatNumber(endLevelModalData.accentXp)}</kbd>
 					<span>Bonus for accent sensitivity</span>
 				</div>
 			</div>
@@ -626,7 +681,12 @@
 
 			<div class="flex gap-4 items-center mt-4">
 				<kbd class="kbd"
-					>{endLevelModalData.accentXp + endLevelModalData.caseXp + endLevelModalData.xp}</kbd
+					>{formatNumber(
+						endLevelModalData.doubleXp +
+							endLevelModalData.accentXp +
+							endLevelModalData.caseXp +
+							endLevelModalData.xp
+					)}</kbd
 				> <span>Total XP</span>
 			</div>
 
