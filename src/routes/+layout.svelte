@@ -478,7 +478,7 @@
 		{/if}
 
 		{#if data.user === null}
-			<a href="https://rewrite.authui.site/" class="btn btn-circle btn-active btn-ghost">
+			<a href="https://auth.rewrite.almostapps.eu/" class="btn btn-circle btn-active btn-ghost">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					fill="none"

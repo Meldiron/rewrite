@@ -14,11 +14,11 @@
 			</p>
 			<div class="flex flex-col sm:flex-row gap-4 w-full justify-center">
 				{#if data.user === null}
-					<a href="https://rewrite.authui.site/">
+					<a href="https://auth.rewrite.almostapps.eu/">
 						<button class="btn btn-active btn-ghost btn-wide">Sign In</button>
 					</a>
 
-					<a href="https://rewrite.authui.site/">
+					<a href="https://auth.rewrite.almostapps.eu/">
 						<button class="btn btn-active btn-outline btn-wide">Sign Up</button>
 					</a>
 				{:else}
