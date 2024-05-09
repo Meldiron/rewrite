@@ -54,7 +54,6 @@ export function isStreakEnded(streakDate: string | null) {
 }
 
 export function xpNeededForLevel(level: number) {
-	/*
 	let xpNeeded = 0;
 
 	let xpMultiplier = 1000;
@@ -63,10 +62,6 @@ export function xpNeededForLevel(level: number) {
 		xpMultiplier += 1000;
 	}
 
-	return xpNeeded;
-	*/
-
-	let xpNeeded = level * level * 200 + 500;
 	return xpNeeded;
 }
 
