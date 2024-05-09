@@ -189,6 +189,7 @@
 		endLevelModalData.caseXp = xpToAddCase;
 		endLevelModalData.doubleXp = xpToAddDouble;
 
+		let questsFinished = data.profile.questsFinished;
 		let currentQuest = data.profile.currentQuest;
 		let coins = data.profile.coins;
 
@@ -197,6 +198,7 @@
 			currentQuestJson.progress += goldenWords.length;
 			if (currentQuestJson.progress >= currentQuestJson.amount) {
 				currentQuest = '';
+				questsFinished++;
 				coins += currentQuestJson.reward;
 			} else {
 				currentQuest = JSON.stringify(currentQuestJson);
@@ -234,6 +236,7 @@
 			maxStreak,
 			xp,
 			currentQuest,
+			questsFinished,
 			coins,
 			wordsFinished,
 			pagesFinished,

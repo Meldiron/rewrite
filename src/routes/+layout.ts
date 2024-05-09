@@ -33,6 +33,7 @@ export const load: LayoutLoad = async () => {
 				booksFinished: 0,
 				coins: 0,
 				currentQuest: null,
+				questsFinished: 0,
 				wordsWithAccentSensitivityFinished: 0,
 				wordsWithCaseSensitivityFinished: 0,
 				lengthyWordsFinished: 0,

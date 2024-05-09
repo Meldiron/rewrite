@@ -29,11 +29,13 @@
 
 	let currentQuest: any = null;
 	function setCurrentQuest() {
-		try {
-			currentQuest = JSON.parse(data.profile.currentQuest);
-		} catch (err: any) {
-			$toastStore = err.message || err || 'An error occurred';
-			currentQuest = null;
+		if (data.profile) {
+			try {
+				currentQuest = JSON.parse(data.profile.currentQuest);
+			} catch (err: any) {
+				$toastStore = err.message || err || 'An error occurred';
+				currentQuest = null;
+			}
 		}
 	}
 
@@ -174,6 +176,15 @@
 			silver: 2500,
 			gold: 10000,
 			diamond: 50000
+		},
+		{
+			name: 'Quest Hunter',
+			action: 'quests finished',
+			key: 'questsFinished',
+			bronze: 25,
+			silver: 200,
+			gold: 1000,
+			diamond: 5000
 		},
 		{
 			name: 'Book worm',
@@ -337,11 +348,14 @@
 
 		isBuying = true;
 
+		const yesterday = new Date();
+		yesterday.setDate(yesterday.getDate() - 1);
+
 		try {
 			await databases.updateDocument('main', 'profiles', data.profile.$id, {
 				coins: data.profile.coins - 15,
 				streak: data.profile.maxStreak,
-				lastStreakDate: new Date().toISOString()
+				lastStreakDate: yesterday.toISOString()
 			});
 			await invalidateAll();
 		} catch (err: any) {
@@ -773,7 +787,7 @@
 									<div class="w-full">
 										<p class="text-primary text-sm">{achievement.name}</p>
 										<progress
-											class="progress w-56"
+											class="progress"
 											value={data.profile[achievement.key] ?? 0}
 											max={getGoal(achievement, data.profile[achievement.key] ?? 0)}
 										></progress>
