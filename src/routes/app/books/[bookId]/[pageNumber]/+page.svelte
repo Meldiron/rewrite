@@ -458,7 +458,14 @@
 			const currentQuest = JSON.parse(data.profile.currentQuest);
 
 			if (currentQuest.type === 'length') {
-				return word.length >= +currentQuest.details;
+				if(word.length >= +currentQuest.details) {
+					if (!goldenWords.includes(index)) {
+						goldenWords.push(index);
+					}
+					return true;
+				} else {
+					return false;
+				}
 			}
 
 			const correctLetter = latinize(currentQuest.details).toLowerCase();
@@ -489,7 +496,7 @@
 				}
 			}
 
-			if (currentQuest.type === 'starts') {
+			if (currentQuest.type === 'ends') {
 				let letter = getWordSimplified(word).split('')[word.length - 1] ?? '';
 				letter = latinize(letter).toLowerCase();
 				if (letter === correctLetter) {
