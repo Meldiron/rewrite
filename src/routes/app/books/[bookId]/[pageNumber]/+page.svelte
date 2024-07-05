@@ -42,6 +42,10 @@
 	$: data, reloadStats();
 	$: data, setActiveAutocorrects();
 
+	function getTotalWords() {
+		return data.page.text.split('\n').join(' ').split(' ').length;
+	}
+
 	function setActiveAutocorrects() {
 		activeAutocorrects = data.profile.autocorrects;
 	}
@@ -77,6 +81,7 @@
 
 	$: linesOfWords = data.page.text.split('\n').map((line: string) => line.split(' '));
 
+	let correctWords = 0;
 	let activeLine = 0;
 	let activeWord = 0;
 	let correctLetters = 0;
@@ -95,9 +100,11 @@
 		if (!autoSaves[key]) {
 			activeLine = 0;
 			activeWord = 0;
+			correctWords = 0;
 		} else {
 			activeLine = autoSaves[key].activeLine;
 			activeWord = autoSaves[key].activeWord;
+			correctWords = autoSaves[key].correctWords;
 		}
 	}
 
@@ -113,6 +120,7 @@
 
 		autoSaves[key].activeLine = Math.max(activeLine, 0);
 		autoSaves[key].activeWord = Math.max(activeWord, 0);
+		autoSaves[key].correctWords = Math.max(correctWords, 0);
 
 		localStorage.setItem('autoSaves', JSON.stringify(autoSaves));
 	}
@@ -265,7 +273,9 @@
 		}
 
 		autoSaves[key].activeLine = 0;
+		autoSaves[key].correctWords = 0;
 		autoSaves[key].activeWord = 0;
+		correctWords = 0;
 		activeLine = 0;
 		activeWord = 0;
 		correctLetters = 0;
@@ -298,6 +308,8 @@
 	}
 
 	async function nextWord(target: any) {
+		correctWords++;
+
 		if (!madeMistake) {
 			noMistakeWords++;
 		}
@@ -335,7 +347,7 @@
 		}
 
 		const wordEl = document.getElementById(`${activeLine}-${activeWord}`);
-		if(wordEl) {
+		if (wordEl) {
 			wordEl.scrollIntoView({
 				behavior: 'smooth',
 				block: 'center',
@@ -463,7 +475,7 @@
 			const currentQuest = JSON.parse(data.profile.currentQuest);
 
 			if (currentQuest.type === 'length') {
-				if(word.length >= +currentQuest.details) {
+				if (word.length >= +currentQuest.details) {
 					if (!goldenWords.includes(index)) {
 						goldenWords.push(index);
 					}
@@ -638,30 +650,40 @@
 		{activeAutocorrects === 1 ? 'Autocorrect' : 'Autocorrects'}
 	</button>
 
-	<div
-		class="flex gap-4 justify-center w-full p-6 rounded-tr-xl backdrop-blur-md bg-black bg-opacity-50"
-	>
-		<input
-			bind:this={inputEl}
-			on:keydown={onKeyDown}
-			on:input={onChange}
-			type="text"
-			autofocus={true}
-			placeholder="Type here"
-			class="input input-lg border-3 input-bordered w-full"
-		/>
+	<div class="w-full p-6 pt-0 rounded-tr-xl backdrop-blur-md bg-black bg-opacity-50">
+		<div class="relative">
+			<progress class="progress my-2 h-3" value={correctWords} max={getTotalWords()}></progress>
 
-		<button
-			disabled={!canSkip}
-			on:click={onSkipWord}
-			class={`btn btn-lg btn-ghost btn-active text-sm ${canSkip ? '' : '!text-white !text-opacity-60'}`}
-		>
-			{#if canSkip}
-				Skip word
-			{:else}
-				Wait {secondsLeft} {secondsLeft === 1 ? 'second' : 'seconds'}
-			{/if}
-		</button>
+			<div class="absolute left-0 top-0 h-full text-xs flex">
+				<p class="mt-[5.5px] ml-1 text-black">
+					{Math.ceil((correctWords / getTotalWords()) * 100)}%
+				</p>
+			</div>
+		</div>
+
+		<div class="flex gap-4 justify-center">
+			<input
+				bind:this={inputEl}
+				on:keydown={onKeyDown}
+				on:input={onChange}
+				type="text"
+				autofocus={true}
+				placeholder="Type here"
+				class="input input-lg border-3 input-bordered w-full"
+			/>
+
+			<button
+				disabled={!canSkip}
+				on:click={onSkipWord}
+				class={`btn btn-lg btn-ghost btn-active text-sm ${canSkip ? '' : '!text-white !text-opacity-60'}`}
+			>
+				{#if canSkip}
+					Skip word
+				{:else}
+					Wait {secondsLeft} {secondsLeft === 1 ? 'second' : 'seconds'}
+				{/if}
+			</button>
+		</div>
 	</div>
 </div>
 
