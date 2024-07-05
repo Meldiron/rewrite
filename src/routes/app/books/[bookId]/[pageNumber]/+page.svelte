@@ -318,11 +318,7 @@
 		correctLetters = 0;
 		wrongLetters = 0;
 
-		console.log(activeWord);
-
 		activeWord++;
-
-		console.log(activeWord);
 
 		if (activeWord >= linesOfWords[activeLine].length) {
 			activeWord = 0;
@@ -336,6 +332,15 @@
 			wrongLetters = 0;
 
 			finishPage();
+		}
+
+		const wordEl = document.getElementById(`${activeLine}-${activeWord}`);
+		if(wordEl) {
+			wordEl.scrollIntoView({
+				behavior: 'smooth',
+				block: 'center',
+				inline: 'center'
+			});
 		}
 	}
 
@@ -606,7 +611,7 @@
 					{@const isActiveWord = isActiveLine && activeWord === wordIndex}
 					{@const index = lineIndex + '-' + wordIndex}
 					{@const isGolden = isQuestWord(word, index)}
-					<span>
+					<span id={`${lineIndex}-${wordIndex}`}>
 						{#each word.split('') as letter, letterIndex}
 							{@const isGreen =
 								activeLine > lineIndex ||
