@@ -13,7 +13,7 @@
 		hasStreak,
 		isStreakEnded
 	} from '$lib/utils';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 
 	export let data: PageData;
 
@@ -307,7 +307,7 @@
 		target.value = linesOfWords[activeLine][activeWord];
 	}
 
-	async function nextWord(target: any) {
+	async function nextWord(target: any, endedWithWildcard = false) {
 		correctWords++;
 
 		if (!madeMistake) {
@@ -344,6 +344,11 @@
 			wrongLetters = 0;
 
 			finishPage();
+		} else {
+			if(endedWithWildcard) {
+				await tick();
+				handleWord(target.value, target, true);
+			}
 		}
 
 		const wordEl = document.getElementById(`${activeLine}-${activeWord}`);
@@ -357,6 +362,7 @@
 	}
 
 	async function handleWord(word: string, target: any, isWildcard = false) {
+		const beginAsWildcard = isWildcard;
 		correctLetters = 0;
 		wrongLetters = 0;
 
@@ -397,6 +403,27 @@
 			}
 
 			i++;
+		}
+
+		console.log(currentWord);
+
+		if(wrongLetters <= 0 && beginAsWildcard) {
+			for(let l = i; l < currentWord.length; l++) {
+				const currentLetter = currentWord[l];
+				const pattern = /^[0-9a-zA-Z]*$/;
+				if (pattern.test(currentLetter)) {
+					break;
+				}
+
+				target.value = target.value + currentLetter;
+				correctLetters++;
+			}
+		}
+
+
+		if(beginAsWildcard && target.value.length === currentWord.length && wrongLetters === 0) {
+			nextWord(target, true);
+			return;
 		}
 
 		if (wrongLetters > 0) {
