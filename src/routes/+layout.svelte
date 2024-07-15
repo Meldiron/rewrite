@@ -29,7 +29,7 @@
 
 	let currentQuest: any = null;
 	function setCurrentQuest() {
-		if (data.profile) {
+		if (data.profile && data.profile.currentQuest) {
 			try {
 				currentQuest = JSON.parse(data.profile.currentQuest);
 			} catch (err: any) {
