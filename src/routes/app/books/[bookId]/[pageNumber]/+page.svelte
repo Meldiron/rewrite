@@ -38,7 +38,7 @@
 	let accentWords = 0;
 	let caseWords = 0;
 
-	let totalWords = 0;
+	let totalWords = 1;
 
 	$: data, scrollToBottom();
 	$: data, reloadStats();
@@ -350,7 +350,7 @@
 		} else {
 			if(endedWithWildcard) {
 				await tick();
-				handleWord(target.value, target, true);
+				handleWord(target.value, target, true, true);
 			}
 		}
 
@@ -364,7 +364,7 @@
 		}
 	}
 
-	async function handleWord(word: string, target: any, isWildcard = false) {
+	async function handleWord(word: string, target: any, isWildcard = false, isAutoBeginningWorld = false) {
 		const beginAsWildcard = isWildcard;
 		correctLetters = 0;
 		wrongLetters = 0;
@@ -408,11 +408,9 @@
 			i++;
 		}
 
-		console.log(currentWord);
-
 		if(wrongLetters <= 0 && beginAsWildcard) {
 			for(let l = i; l < currentWord.length; l++) {
-				const currentLetter = currentWord[l];
+				const currentLetter = latinize(currentWord[l]);
 				const pattern = /^[0-9a-zA-Z]*$/;
 				if (pattern.test(currentLetter)) {
 					break;
@@ -451,7 +449,18 @@
 		}
 	}
 
+	function clearMistakes(target: any) {
+		for(let i = 0; i < wrongLetters; i++) {
+			target.value = target.value.slice(0, target.value.length - 1);
+		}
+		handleWord(target.value, target, false);
+	}
+
 	function onKeyDown(e: any) {
+		if(wrongLetters > 0 && e.key.toLowerCase() === 'backspace') {
+			clearMistakes(e.target);
+		}
+
 		if (e.target.value === '' && e.key.toLowerCase() === 'backspace') {
 			previousWord(e.target);
 			e.preventDefault();
