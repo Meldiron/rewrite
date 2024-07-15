@@ -450,7 +450,7 @@
 	}
 
 	function clearMistakes(target: any) {
-		for(let i = 0; i < wrongLetters; i++) {
+		for(let i = 1; i < wrongLetters; i++) {
 			target.value = target.value.slice(0, target.value.length - 1);
 		}
 		handleWord(target.value, target, false);
