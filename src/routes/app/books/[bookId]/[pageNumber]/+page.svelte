@@ -458,7 +458,7 @@
 
 	function onKeyDown(e: any) {
 		if(wrongLetters > 0 && e.key.toLowerCase() === 'backspace') {
-			clearMistakes(e.target);
+			// clearMistakes(e.target); // Bad UX
 		}
 
 		if (e.target.value === '' && e.key.toLowerCase() === 'backspace') {
