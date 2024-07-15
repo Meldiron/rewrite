@@ -53,13 +53,35 @@ export function isStreakEnded(streakDate: string | null) {
 	return false;
 }
 
+export function xpForSpecificLevel(level: number) {
+	if(level <= 10) {
+		return 2000;
+	}
+
+	if(level <= 30) {
+		return 3000;
+	}
+
+	if(level <= 50) {
+		return 5000;
+	}
+
+	if(level <= 75) {
+		return 8000;
+	}
+
+	if(level <= 100) {
+		return 15000;
+	}
+
+	return 30000;
+}
+
 export function xpNeededForLevel(level: number) {
 	let xpNeeded = 0;
 
-	let xpMultiplier = 1000;
 	for (let i = 1; i < level; i++) {
-		xpNeeded += xpMultiplier;
-		xpMultiplier += 1000;
+		xpNeeded += xpForSpecificLevel(i);
 	}
 
 	return xpNeeded;
@@ -103,6 +125,8 @@ export function getExtraXp(xp: number) {
 	const level = getLevel(xp);
 	const xpCurrent = xpNeededForLevel(level);
 	const extraXp = xp - xpCurrent;
+
+	console.log(xp, level, xpCurrent, extraXp);
 
 	return extraXp;
 }
