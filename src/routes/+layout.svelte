@@ -293,6 +293,25 @@
 		}
 	}
 
+	async function setPageScreenshot(e: any) {
+		if (isSavingSettings) {
+			return;
+		}
+
+		isSavingSettings = true;
+
+		try {
+			const prefs = data.user?.prefs ?? {};
+			prefs.pageScreenshot = e.target.checked;
+			await account.updatePrefs(prefs);
+			await invalidateAll();
+		} catch (err: any) {
+			$toastStore = err.message || err || 'An error occurred';
+		} finally {
+			isSavingSettings = false;
+		}
+	}
+
 	async function setCaseSensitivity(e: any) {
 		if (isSavingSettings) {
 			return;
@@ -689,6 +708,19 @@
 										disabled={isSavingSettings}
 										checked={data.user.prefs.accentSensitivity ?? false}
 										on:change={(e) => setAccentSensitivity(e)}
+										type="checkbox"
+										class="toggle"
+									/>
+								</label>
+							</div>
+
+							<div class="form-control">
+								<label class="label cursor-pointer">
+									<span class="label-text">Page screenshot</span>
+									<input
+										disabled={isSavingSettings}
+										checked={data.user.prefs.pageScreenshot ?? false}
+										on:change={(e) => setPageScreenshot(e)}
 										type="checkbox"
 										class="toggle"
 									/>

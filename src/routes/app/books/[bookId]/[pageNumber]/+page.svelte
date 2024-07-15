@@ -26,7 +26,6 @@
 		doubleXp: 0
 	};
 
-	let currentMainTab: 'text' | 'screenshot' = 'text';
 	let previousPageEl: HTMLDivElement;
 	let inputEl: HTMLInputElement;
 
@@ -348,7 +347,7 @@
 
 			finishPage();
 		} else {
-			if(endedWithWildcard) {
+			if (endedWithWildcard) {
 				await tick();
 				handleWord(target.value, target, true, true);
 			}
@@ -364,7 +363,12 @@
 		}
 	}
 
-	async function handleWord(word: string, target: any, isWildcard = false, isAutoBeginningWorld = false) {
+	async function handleWord(
+		word: string,
+		target: any,
+		isWildcard = false,
+		isAutoBeginningWorld = false
+	) {
 		const beginAsWildcard = isWildcard;
 		correctLetters = 0;
 		wrongLetters = 0;
@@ -408,8 +412,8 @@
 			i++;
 		}
 
-		if(wrongLetters <= 0 && beginAsWildcard) {
-			for(let l = i; l < currentWord.length; l++) {
+		if (wrongLetters <= 0 && beginAsWildcard) {
+			for (let l = i; l < currentWord.length; l++) {
 				const currentLetter = latinize(currentWord[l]);
 				const pattern = /^[0-9a-zA-Z]*$/;
 				if (pattern.test(currentLetter)) {
@@ -421,8 +425,7 @@
 			}
 		}
 
-
-		if(beginAsWildcard && target.value.length === currentWord.length && wrongLetters === 0) {
+		if (beginAsWildcard && target.value.length === currentWord.length && wrongLetters === 0) {
 			nextWord(target, true);
 			return;
 		}
@@ -450,14 +453,14 @@
 	}
 
 	function clearMistakes(target: any) {
-		for(let i = 1; i < wrongLetters; i++) {
+		for (let i = 1; i < wrongLetters; i++) {
 			target.value = target.value.slice(0, target.value.length - 1);
 		}
 		handleWord(target.value, target, false);
 	}
 
 	function onKeyDown(e: any) {
-		if(wrongLetters > 0 && e.key.toLowerCase() === 'backspace') {
+		if (wrongLetters > 0 && e.key.toLowerCase() === 'backspace') {
 			// clearMistakes(e.target); // Bad UX
 		}
 
@@ -632,28 +635,13 @@
 			</div>
 		</div>
 	{/if}
+</div>
 
-	<div class="flex gap-3 sticky top-[60px] z-[20] backdrop-blur-sm w-[fit-content] p-3 rounded-xl">
-		<button
-			on:click={() => (currentMainTab = 'text')}
-			class={`${currentMainTab === 'text' ? 'bg-white text-black' : 'bg-base-300'} text-xs w-[fit-content] px-3 py-2 pb-1 rounded-md pb-3`}
-		>
-			Page to rewrite
-		</button>
-		<button
-			on:click={() => (currentMainTab = 'screenshot')}
-			class={`${currentMainTab === 'screenshot' ? 'bg-white text-black' : 'bg-base-300'} text-xs w-[fit-content] px-3 py-2 pb-1 rounded-md pb-3`}
-		>
-			Page screenshot
-		</button>
-	</div>
+<div
+	class={`${data.user?.prefs.pageScreenshot ? 'grid w-full grid-cols-12 gap-6' : 'max-w-2xl mx-auto'}`}
+>
 	<div
-		class={`${currentMainTab === 'screenshot' ? '' : 'hidden'} card relative rounded-tl-none rounded-md bg-base-100 shadow-xl p-3 text-xl`}
-	>
-		<img src={fileUrl} alt="Screenshot" class="rounded-md" />
-	</div>
-	<div
-		class={`${currentMainTab === 'text' ? '' : 'hidden'} card relative rounded-md ${data.isCompleted ? 'bg-success bg-opacity-10' : 'bg-base-100'} shadow-xl p-3 text-xl`}
+		class={`${data.user?.prefs.pageScreenshot ? 'col-span-6' : 'col-span-12'} card relative rounded-md ${data.isCompleted ? 'bg-success bg-opacity-10' : 'bg-base-100'} shadow-xl p-3 text-xl`}
 	>
 		{#each linesOfWords as words, lineIndex}
 			<p class="my-1 flex flex-wrap gap-1 text-primary text-opacity-60">
@@ -679,6 +667,12 @@
 			</p>
 		{/each}
 	</div>
+
+	{#if data.user?.prefs.pageScreenshot}
+		<div class="col-span-6">
+			<img src={fileUrl} alt="Screenshot" class="top-[85px] sticky rounded-md w-full" />
+		</div>
+	{/if}
 </div>
 
 <div class="fixed bottom-0 left-0 w-full">
