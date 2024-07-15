@@ -38,12 +38,15 @@
 	let accentWords = 0;
 	let caseWords = 0;
 
+	let totalWords = 0;
+
 	$: data, scrollToBottom();
 	$: data, reloadStats();
 	$: data, setActiveAutocorrects();
+	$: data, updateTotalWords();
 
-	function getTotalWords() {
-		return data.page.text.split('\n').join(' ').split(' ').length;
+	function updateTotalWords() {
+		totalWords = data.page.text.split('\n').join(' ').split(' ').length;
 	}
 
 	function setActiveAutocorrects() {
@@ -679,11 +682,11 @@
 
 	<div class="w-full p-6 pt-0 rounded-tr-xl backdrop-blur-md bg-black bg-opacity-50">
 		<div class="relative">
-			<progress class="progress my-2 h-3" value={correctWords} max={getTotalWords()}></progress>
+			<progress class="progress my-2 h-3" value={correctWords} max={totalWords}></progress>
 
 			<div class="absolute left-0 top-0 h-full text-xs flex">
 				<p class="mt-[5.5px] ml-1 text-black">
-					{Math.ceil((correctWords / getTotalWords()) * 100)}%
+					{Math.ceil((correctWords / totalWords) * 100)}%
 				</p>
 			</div>
 		</div>
