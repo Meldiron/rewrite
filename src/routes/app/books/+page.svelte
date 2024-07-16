@@ -236,21 +236,10 @@
 								<div class="w-full aspect-[3/4] !w-[250px]">
 									<img
 										class="object-cover w-full h-full object-contain transform transition duration-300 scale-[100%] hover:scale-[110%]"
-										src={getFilePreview(
+										src={storage.getFileView(
 											'pages',
-											`${book.$id}-1`,
-											500,
-											undefined,
-											undefined,
-											undefined,
-											undefined,
-											undefined,
-											undefined,
-											undefined,
-											undefined,
-											undefined,
-											'webp'
-										)}
+											`${book.$id}-1`
+										).toString()}
 										alt="Book"
 									/>
 								</div>
