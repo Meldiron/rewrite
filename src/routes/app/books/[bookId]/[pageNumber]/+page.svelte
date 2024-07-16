@@ -764,15 +764,11 @@
 				<div class="flex items-center justify-end gap-4">
 					<p class="text-primary">{getXpRemaining(data.profile.xp)} XP left</p>
 				</div>
-				{#if isSavingProgress}
-					<progress class="progress progress-base-200 w-full"></progress>
-				{:else}
-					<progress
-						class="progress progress-base-200 w-full"
-						value={getLevelProgress(data.profile.xp)}
-						max={100}
-					></progress>
-				{/if}
+				<progress
+					class={`progress progress-base-200 w-full ${isSavingProgress ? 'opacity-50' : 'opacity-100'}`}
+					value={getLevelProgress(data.profile.xp)}
+					max={100}
+				></progress>
 				<div class="flex items-center justify-between gap-4">
 					<p>Level {getLevel(data.profile.xp)}</p>
 					<p>Level {getLevel(data.profile.xp) + 1}</p>
@@ -780,12 +776,21 @@
 			</div>
 
 			<div class="modal-action">
-				<button on:click={() => (endLevelModalOpened = false)} class="btn">Close</button>
-				<a
+				<button
+					disabled={isSavingProgress}
 					on:click={() => (endLevelModalOpened = false)}
-					href={`/app/books/${data.book.$id}/${data.page.page + 1}`}
-					class="btn btn-primary">Next Page</a
+					class="btn">Close</button
 				>
+				{#if isSavingProgress}
+					<button disabled={true} class="btn btn-primary"> Next Page </button>
+				{:else}
+					<a
+						on:click={() => (endLevelModalOpened = false)}
+						href={`/app/books/${data.book.$id}/${data.page.page + 1}`}
+					>
+						Next page
+					</a>
+				{/if}
 			</div>
 		</div>
 	</div>
