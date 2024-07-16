@@ -493,7 +493,7 @@
 			return;
 		}
 
-		secondsLeft = 3;
+		secondsLeft = 5;
 		canSkip = false;
 
 		if (secondsInterval) {
@@ -787,6 +787,7 @@
 					<a
 						on:click={() => (endLevelModalOpened = false)}
 						href={`/app/books/${data.book.$id}/${data.page.page + 1}`}
+						class="btn btn-primary"
 					>
 						Next page
 					</a>
