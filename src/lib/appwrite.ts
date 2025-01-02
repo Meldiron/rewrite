@@ -11,34 +11,12 @@ export const functions = new Functions(client);
 
 export function getFilePreview(
 	bucketId: string,
-	fileId: string,
-	width?: number,
-	height?: number,
-	gravity?: string,
-	quality?: number,
-	borderWidth?: number,
-	borderColor?: string,
-	borderRadius?: number,
-	opacity?: number,
-	rotation?: number,
-	background?: string,
-	output?: string
+	fileId: string
 ): string {
 	const url = storage
-		.getFilePreview(
+		.getFileView(
 			bucketId,
-			fileId,
-			width,
-			height,
-			gravity,
-			quality,
-			borderWidth,
-			borderColor,
-			borderRadius,
-			opacity,
-			rotation,
-			background,
-			output
+			fileId
 		)
 		.toString();
 	return url.split('appwrite.rewrite.almostapps.eu').join('rewrite-app.b-cdn.net');

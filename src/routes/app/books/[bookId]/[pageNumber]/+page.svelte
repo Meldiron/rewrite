@@ -67,18 +67,7 @@
 	$: fileId = `${data.book.$id}-${data.page.page}`;
 	$: fileUrl = getFilePreview(
 		'pages',
-		fileId,
-		1920,
-		undefined,
-		undefined,
-		undefined,
-		undefined,
-		undefined,
-		undefined,
-		undefined,
-		undefined,
-		undefined,
-		'webp'
+		fileId
 	);
 
 	$: linesOfWords = data.page.text.split('\n').map((line: string) => line.split(' '));
