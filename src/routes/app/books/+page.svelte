@@ -2,7 +2,7 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import { databases, functions, getFilePreview, storage } from '$lib/appwrite';
 	import { profileMenuStore, toastStore } from '$lib/stores';
-	import { Query } from 'appwrite';
+	import { ExecutionMethod, Query } from 'appwrite';
 	import type { PageData } from './$types';
 	import debounce from 'lodash/debounce';
 	import { formatNumber, getLevel } from '$lib/utils';
@@ -113,7 +113,7 @@
 				}),
 				false,
 				`/v1/books/${edittingId}/metadata`,
-				'PUT'
+				ExecutionMethod.PUT
 			);
 
 			$toastStore = {
@@ -236,10 +236,7 @@
 								<div class="w-full aspect-[3/4] !w-[250px]">
 									<img
 										class="object-cover w-full h-full object-contain transform transition duration-300 scale-[100%] hover:scale-[110%]"
-										src={storage.getFileView(
-											'pages',
-											`${book.$id}-1`
-										).toString()}
+										src={storage.getFileView('pages', `${book.$id}-1`).toString()}
 										alt="Book"
 									/>
 								</div>

@@ -35,7 +35,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"appwrite": "^13.0.2",
+		"appwrite": "^16.1.0",
 		"lodash": "^4.17.21"
 	}
 }

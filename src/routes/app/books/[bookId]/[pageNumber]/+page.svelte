@@ -65,10 +65,7 @@
 	});
 
 	$: fileId = `${data.book.$id}-${data.page.page}`;
-	$: fileUrl = getFilePreview(
-		'pages',
-		fileId
-	);
+	$: fileUrl = getFilePreview('pages', fileId);
 
 	$: linesOfWords = data.page.text.split('\n').map((line: string) => line.split(' '));
 

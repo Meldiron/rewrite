@@ -2,7 +2,7 @@
 	import { databases, storage } from '$lib/appwrite';
 	import type { PageData } from './$types';
 	import { functions } from '$lib/appwrite';
-	import { ID } from 'appwrite';
+	import { ExecutionMethod, ID } from 'appwrite';
 	import { goto, invalidateAll } from '$app/navigation';
 	import { toastStore } from '$lib/stores';
 
@@ -89,7 +89,7 @@
 				licenseKey,
 				false,
 				'/v1/tokens',
-				'POST'
+				ExecutionMethod.POST
 			);
 
 			$toastStore = {

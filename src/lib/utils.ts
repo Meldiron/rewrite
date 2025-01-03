@@ -54,23 +54,23 @@ export function isStreakEnded(streakDate: string | null) {
 }
 
 export function xpForSpecificLevel(level: number) {
-	if(level <= 10) {
+	if (level <= 10) {
 		return 2000;
 	}
 
-	if(level <= 30) {
+	if (level <= 30) {
 		return 3000;
 	}
 
-	if(level <= 50) {
+	if (level <= 50) {
 		return 5000;
 	}
 
-	if(level <= 75) {
+	if (level <= 75) {
 		return 8000;
 	}
 
-	if(level <= 100) {
+	if (level <= 100) {
 		return 15000;
 	}
 
